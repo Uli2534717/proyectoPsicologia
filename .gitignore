@@ -1,0 +1,34 @@
+# ---------------------------------------------------------------------------
+#  .gitignore de DormirBien (Android Studio + Gradle)
+#  Regla: a Git solo sube lo que otra persona necesita para compilar.
+# ---------------------------------------------------------------------------
+
+# --- Gradle y Kotlin (se regeneran solos) ---
+.gradle/
+.kotlin/
+build/
+/captures
+.externalNativeBuild
+.cxx
+
+# --- Configuración local de cada computadora ---
+# local.properties tiene la ruta del SDK de TU computadora.
+local.properties
+
+# --- Android Studio / IntelliJ ---
+# Se ignora todo .idea menos el estilo de código y las inspecciones,
+# que sí conviene compartir para que todos formateen igual.
+*.iml
+.idea/*
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+
+# --- Firmas y secretos (NUNCA subirlos) ---
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db

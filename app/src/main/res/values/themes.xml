@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Tema "nativo" de la ventana. Compose dibuja todo lo demás, pero este
+        color se ve un instante al abrir la app, antes de que Compose arranque.
+        Por eso es oscuro: así no hay un destello blanco a media noche.
+    -->
+    <style name="Theme.DormirBien" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/fondo_noche</item>
+    </style>
+</resources>

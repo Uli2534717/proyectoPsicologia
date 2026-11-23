@@ -1,0 +1,19 @@
+# Normaliza los saltos de línea para que Windows y Mac no generen
+# conflictos "fantasma" (archivos que cambian sin que nadie los toque).
+* text=auto
+
+# gradlew se ejecuta en Linux (GitHub Actions): siempre con LF.
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Los .bat de Windows necesitan CRLF.
+*.bat text eol=crlf
+
+# Binarios: Git no debe tocarlos.
+*.jar binary
+*.png binary
+*.webp binary
+*.jpg binary
+*.mp3 binary
+*.ogg binary
+*.wav binary

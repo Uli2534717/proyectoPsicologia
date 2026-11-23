@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Textos de la app. REGLA DEL EQUIPO: ningún texto visible se escribe
+    directo en el código Kotlin; todo va aquí y se usa con stringResource(...).
+    Usa el prefijo de tu módulo (sonidos_, alarma_, ...) para evitar choques
+    y conflictos de Git.
+-->
+<resources>
+    <string name="app_name">DormirBien</string>
+
+    <!-- Comunes -->
+    <string name="en_construccion">Próximamente</string>
+
+    <!-- Barra de navegación inferior -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_sonidos">Sonidos</string>
+    <string name="nav_alarma">Alarma</string>
+    <string name="nav_emociones">Emociones</string>
+    <string name="nav_ajustes">Ajustes</string>
+
+    <!-- Inicio -->
+    <string name="inicio_saludo">Buenas noches</string>
+    <string name="inicio_subtitulo">¿Qué te gustaría hacer antes de dormir?</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_titulo">Bienvenida</string>
+    <string name="onboarding_descripcion">Conoce la app, revisa el aviso de privacidad y configura tu meta de sueño.</string>
+
+    <!-- Vaciado mental -->
+    <string name="vaciado_titulo">Vaciado mental</string>
+    <string name="vaciado_descripcion">Escribe lo que te preocupa y lo que puedes dejar para mañana.</string>
+
+    <!-- Diario de sueño -->
+    <string name="diario_sueno_titulo">Diario de sueño</string>
+    <string name="diario_sueno_descripcion">Registra a qué hora te acostaste, a qué hora despertaste y cómo dormiste.</string>
+
+    <!-- Sonidos -->
+    <string name="sonidos_titulo">Sonidos relajantes</string>
+    <string name="sonidos_descripcion">Mezcla lluvia, olas, ruido blanco y más, con temporizador de apagado.</string>
+
+    <!-- Alarma -->
+    <string name="alarma_titulo">Alarma inteligente</string>
+    <string name="alarma_descripcion">Te despierta en una fase de sueño ligero, dentro de la ventana que elijas.</string>
+
+    <!-- Emociones -->
+    <string name="emociones_titulo">Registro emocional</string>
+    <string name="emociones_descripcion">Anota tu estado de ánimo y tu nivel de estrés de cada día.</string>
+
+    <!-- Estadísticas -->
+    <string name="estadisticas_titulo">Estadísticas</string>
+    <string name="estadisticas_descripcion">Mira cómo se relacionan tu sueño y tu estado de ánimo. Es una correlación, no un diagnóstico.</string>
+
+    <!-- Aprende -->
+    <string name="aprende_titulo">Aprende sobre el sueño</string>
+    <string name="aprende_descripcion">Tarjetas cortas sobre las fases del sueño, la higiene del sueño y la salud mental.</string>
+
+    <!-- Respiración -->
+    <string name="respiracion_titulo">Respiración guiada</string>
+    <string name="respiracion_descripcion">Ejercicios 4-7-8 y respiración de caja para relajarte.</string>
+
+    <!-- Rutina -->
+    <string name="rutina_titulo">Rutina nocturna</string>
+    <string name="rutina_descripcion">Tu lista de pasos antes de dormir y tu racha de días cumplidos.</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_titulo">Ajustes</string>
+    <string name="ajustes_tema">Tema</string>
+    <string name="ajustes_tema_oscuro">Oscuro (recomendado de noche)</string>
+    <string name="ajustes_tema_claro">Claro</string>
+    <string name="ajustes_tema_sistema">Igual que el teléfono</string>
+</resources>
