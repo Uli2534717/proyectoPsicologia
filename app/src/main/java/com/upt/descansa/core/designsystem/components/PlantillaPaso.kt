@@ -23,7 +23,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.upt.descansa.R
+import androidx.compose.ui.draw.clip
 import com.upt.descansa.core.designsystem.theme.Bordes
+import com.upt.descansa.core.designsystem.theme.Formas
 import com.upt.descansa.core.designsystem.theme.Espacio
 import com.upt.descansa.core.designsystem.theme.LocalColoresCartel
 
@@ -95,7 +97,8 @@ private fun ProgresoPasos(paso: Int) {
                     Modifier
                         .weight(1f)
                         .height(6.dp)
-                        .border(Bordes.normal, color)
+                        .clip(Formas.pildora)
+                        .border(Bordes.normal, color, Formas.pildora)
                         // Un indicador de progreso no es un botón: aquí sí se permite relleno.
                         .then(if (alcanzado) Modifier.background(color) else Modifier),
                 )

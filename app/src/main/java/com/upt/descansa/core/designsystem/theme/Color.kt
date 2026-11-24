@@ -25,6 +25,12 @@ val LilaMarco = Color(0xFFECE3FF)
 /** Texto y bordes de día: carbón con matiz morado (≈13.7:1 sobre LilaLienzo). */
 val CarbonMorado = Color(0xFF2B2140)
 
+/**
+ * Bordes de día: morado suave en lugar de casi negro (D-24).
+ * ≈3.3:1 sobre LilaLienzo: cumple el mínimo de 3:1 para bordes de controles.
+ */
+val BordeLila = Color(0xFF8E7BBE)
+
 /** ÚNICO color interactivo de día: botones, enlaces, etiquetas (≈9.4:1 sobre LilaLienzo). */
 val MoradoProfundo = Color(0xFF4B2E83)
 
@@ -37,6 +43,9 @@ val MoradoNoche = Color(0xFF160F26)
 
 /** Marco de los dibujos de objetos de noche. */
 val MoradoMarcoNoche = Color(0xFF241A3B)
+
+/** Bordes de noche: morado apagado (≈3.2:1 sobre MoradoNoche), en lugar de blanco. */
+val BordeNoche = Color(0xFF6E5C9A)
 
 /** Texto nocturno: blanco hueso con un toque lila. */
 val TextoNoche = Color(0xFFF1ECFA)

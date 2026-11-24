@@ -286,3 +286,13 @@ actualizarlas al poner la foto.
 lila. De noche, la lavanda da ≈9:1. La orquídea de día da ≈1.9:1: es más visible
 que el amarillo anterior (1.2:1) y sigue siendo solo decorativa (ver D-20).
 Esta decisión reemplaza los colores de D-18 y D-21.
+
+## D-24 · Bordes más suaves
+
+**Qué:** a pedido del equipo:
+- Esquinas más redondeadas: tarjetas, campos, imágenes y diálogos pasan de 4 a
+  **16 dp**; botones y opciones de 20 a **24 dp**. La píldora y las etiquetas
+  rectas no cambian. La barra de pasos también es redondeada.
+- Bordes en morado suave en lugar de casi negro: `BordeLila` #8E7BBE de día
+  (≈3.3:1) y `BordeNoche` #6E5C9A de noche (≈3.2:1). Ambos cumplen el mínimo
+  de 3:1 para bordes de controles; el texto conserva su color oscuro.

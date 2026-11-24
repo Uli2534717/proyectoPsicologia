@@ -30,7 +30,7 @@ import com.upt.descansa.core.designsystem.theme.Formas
 import com.upt.descansa.core.designsystem.theme.LocalColoresCartel
 
 /**
- * Imagen principal de una sección: cuadrada, esquinas de 4 dp y contorno de 1.5 dp.
+ * Imagen principal de una sección: cuadrada, esquinas de 16 dp y contorno de 1.5 dp.
  *
  * - Si en `res/drawable/` hay una FOTO (.webp, .png, .jpg) con ese nombre, se muestra la foto.
  * - Si solo está el marcador de prueba (.xml), se dibuja el objeto con un ícono

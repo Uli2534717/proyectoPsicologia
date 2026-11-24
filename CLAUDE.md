@@ -156,8 +156,8 @@ nombres, logotipos, textos ni imágenes de esa marca**.
 Los tamaños de cartel **nunca** se usan para texto de interfaz. Todo en `sp`.
 
 ### Formas, espacio y elevación
-- Radios SOLO: 0 (etiquetas), 4 dp (tarjetas, campos, imágenes), 20 dp
-  (botones), píldora (el botón principal).
+- Radios SOLO: 0 (etiquetas), 16 dp (tarjetas, campos, imágenes, diálogos), 24 dp
+  (botones y opciones), píldora (el botón principal). Bordes en morado suave.
 - Espacios SOLO: 4, 8, 10, 12, 16, 20, 24, 30, 50 dp (`Espacio`). Márgenes de
   pantalla 20, entre secciones 50, entre elementos 20, relleno de tarjeta 20.
 - **Sin sombras, elevación, degradados, vidrio ni texturas.** Bordes de 1.5 dp.

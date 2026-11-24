@@ -8,16 +8,19 @@ import androidx.compose.ui.unit.dp
 //  Formas y espaciado "Cartel sereno". SOLO estos valores están permitidos.
 // =============================================================================
 
-/** Radios de esquina permitidos: 0, 4, 20 dp y píldora. */
+/**
+ * Radios de esquina permitidos: 0, 16, 24 dp y píldora.
+ * Se suavizaron a pedido del equipo (antes 4 y 20 dp; ver D-24).
+ */
 object Formas {
     /** 0 dp: etiquetas de categoría. */
     val recta = RectangleShape
 
-    /** 4 dp: tarjetas, campos de texto e imágenes. */
-    val tarjeta = RoundedCornerShape(4.dp)
+    /** 16 dp: tarjetas, campos de texto, imágenes y diálogos. */
+    val tarjeta = RoundedCornerShape(16.dp)
 
-    /** 20 dp: botones normales. */
-    val boton = RoundedCornerShape(20.dp)
+    /** 24 dp: botones normales y opciones. */
+    val boton = RoundedCornerShape(24.dp)
 
     /** Píldora (50 %): solo el botón principal de cada pantalla. */
     val pildora = RoundedCornerShape(percent = 50)

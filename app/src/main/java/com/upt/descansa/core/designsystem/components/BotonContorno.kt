@@ -11,7 +11,7 @@ import com.upt.descansa.core.designsystem.theme.Formas
 
 /**
  * Botón normal: texto y borde de 1.5 dp en el color interactivo, esquinas de
- * 20 dp, fondo del lienzo. SIN relleno de color en ningún estado.
+ * 24 dp, fondo del lienzo. SIN relleno de color en ningún estado.
  */
 @Composable
 fun BotonContorno(

@@ -39,8 +39,8 @@ private val EsquemaClaro = lightColorScheme(
     surfaceContainerHigh = LilaLienzo,
     surfaceContainerHighest = LilaLienzo,
     surfaceTint = LilaLienzo,
-    outline = CarbonMorado,
-    outlineVariant = CarbonMorado,
+    outline = BordeLila,
+    outlineVariant = BordeLila,
     error = CarbonMorado,
     onError = LilaLienzo,
 )
@@ -70,8 +70,8 @@ private val EsquemaNocturno = darkColorScheme(
     surfaceContainerHigh = MoradoNoche,
     surfaceContainerHighest = MoradoNoche,
     surfaceTint = MoradoNoche,
-    outline = TextoNoche,
-    outlineVariant = TextoNoche,
+    outline = BordeNoche,
+    outlineVariant = BordeNoche,
     error = RosaLilaNoche,
     onError = MoradoNoche,
 )

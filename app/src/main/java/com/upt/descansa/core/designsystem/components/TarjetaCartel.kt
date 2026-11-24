@@ -22,7 +22,7 @@ import com.upt.descansa.core.designsystem.theme.TipoCartel
 
 /**
  * Tarjeta "Cartel sereno": SIN fondo de color ni sombra; solo un contorno de
- * 1.5 dp y esquinas de 4 dp. Si está `seleccionada`, el contorno pasa al color
+ * 1.5 dp y esquinas de 16 dp. Si está `seleccionada`, el contorno pasa al color
  * interactivo y engrosa a 2.5 dp (la selección no depende solo del color).
  */
 @Composable
