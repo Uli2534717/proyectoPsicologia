@@ -75,9 +75,24 @@ Con el acelerómetro real se guardó una época por minuto con la pantalla apaga
 - [ ] **Noche real:** teléfono sobre el colchón; anotar a qué hora sonó y si fue antes de la hora límite: ______
 - [ ] Probar las 3 sensibilidades en noches distintas; anotar la que se sintió mejor: ______
 
+## Fase 3 · No molestar
+
+En el emulador (API 37) ya se comprobó: sin permiso se muestra el aviso; con
+permiso se enciende el modo "Do Not Disturb (Descansa)" en solo alarmas, la
+alarma suena igual, y al apagarla el modo se desactiva.
+
+- [ ] Sin el permiso: el modo noche dice "No molestar: falta el permiso" y "Dar permiso" abre Ajustes de Android.
+- [ ] Dar el permiso y regresar: el aviso cambia a "No molestar activo" y aparece el ícono de No molestar.
+- [ ] Durante la noche, una llamada o mensaje de prueba NO suena.
+- [ ] La alarma SÍ suena con el No molestar activo.
+- [ ] Al apagar la alarma, el No molestar se quita solo.
+- [ ] "Detener" también lo quita.
+- [ ] "Posponer" lo mantiene hasta que se apague la alarma.
+- [ ] Con el No molestar del usuario ya activo antes de dormir: al despertar sigue como estaba.
+- [ ] Desactivar "No molestar" en el paso 5: la noche no lo enciende.
+
 ## Fases siguientes (se completan en su fase)
 
-- [ ] No molestar se activa y se restaura al detener.
 - [ ] Sonido toda la noche con la pantalla apagada y apagado gradual.
 - [ ] Consumo de batería en 8 horas de sesión: ____ %.
 - [ ] Negar cada permiso uno por uno: la app sigue funcionando y lo explica.

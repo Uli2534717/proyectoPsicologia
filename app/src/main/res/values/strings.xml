@@ -136,6 +136,8 @@
     <string name="modo_noche_falta_permiso">Tu alarma sonará, pero falta un permiso para que se vea sobre la pantalla de bloqueo o suene a la hora exacta.</string>
     <string name="modo_noche_dar_permiso">Revisar permiso</string>
     <string name="modo_noche_midiendo">Midiendo movimiento: %1$d min</string>
+    <string name="modo_noche_no_molestar_sin_permiso">No molestar: falta el permiso</string>
+    <string name="modo_noche_dar_permiso_no_molestar">Dar permiso</string>
 
     <!-- Servicio nocturno (notificación) -->
     <string name="noche_canal">Modo noche</string>

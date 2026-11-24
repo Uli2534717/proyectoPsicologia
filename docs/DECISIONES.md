@@ -214,11 +214,42 @@ de acelerómetro con la pantalla apagada.
 - Si se abre la app mientras suena la alarma, se muestra la pantalla de timbre
   (así se puede apagar aunque se hayan negado las notificaciones).
 
+## D-13 · No molestar (Fase 3)
+
+Revisado contra la documentación oficial (cambios de Android 15 y 16,
+`NotificationManager`, `AutomaticZenRule`) el 23 de noviembre de 2026.
+
+**Qué:**
+- Si "No molestar" está activado en el paso 5 o en Ajustes, al activar la noche
+  se pone el filtro **solo alarmas** (`INTERRUPTION_FILTER_ALARMS`). Al apagar la
+  alarma o al detener la noche se restaura. Al posponer se mantiene.
+- **Android 15 o más nuevo** (nuestra targetSdk es 37): una app ya no puede cambiar
+  el No molestar global. `setInterruptionFilter()` enciende un **modo propio de
+  la app** ("Do Not Disturb (Descansa)") y el sistema aplica el más restrictivo.
+  Restaurar = apagar ese modo. El No molestar del usuario nunca se toca.
+- **Android 9 a 14:** se guarda el filtro previo en SharedPreferences y se
+  restaura después. Si el usuario ya tenía No molestar, no se toca (podríamos
+  hacerlo menos estricto). Si lo cambió a mano durante la noche, se respeta.
+- El permiso ("Acceso a No molestar") lo da el usuario a mano en Ajustes de
+  Android. Sin él, la noche funciona igual y el modo noche dice
+  "No molestar: falta el permiso", con un botón para darlo. Al volver con el
+  permiso recién dado, se activa en ese momento.
+- Toda la lógica está en `GestorNoMolestar` (Kotlin puro, 9 pruebas JUnit).
+
+**Por qué:**
+- "Solo alarmas" deja sonar nuestra alarma (usa el canal de alarmas) y silencia lo demás.
+- Si quitan el permiso a media noche, Android lanza `SecurityException`; se atrapa
+  para que nunca impida que suene la alarma.
+- Error encontrado en el emulador y corregido: al apagar la alarma, el modo noche
+  se reanudaba un instante y volvía a encender el No molestar. Ahora solo se
+  reactiva cuando el permiso se acaba de dar (prueba `ModoNocheViewModelTest`).
+
+**Limitación:** en Android 15+ el usuario ve el modo "Do Not Disturb (Descansa)"
+en Ajustes → Modos; el nombre lo pone el sistema.
+
 ---
 
 ## Decisiones previstas para las siguientes fases
 
 Se confirmarán con la documentación oficial vigente antes de implementarlas:
 
-- **Fase 3:** comportamiento de los "Modos" de Android 15+ frente a
-  `setInterruptionFilter`.

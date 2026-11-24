@@ -36,6 +36,13 @@
         android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"
         tools:ignore="HighSamplingRate" />
 
+    <!-- ===== No molestar (Fase 3). Ver docs/DECISIONES.md, D-13. ===== -->
+    <!--
+        Se declara aquí, pero el usuario debe darlo a mano en
+        Ajustes de Android → "Acceso a No molestar" (la app lo lleva ahí).
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
     <!--
         android:name: clase Application con @HiltAndroidApp (activa Hilt).
         android:allowBackup="false": por privacidad, los datos (noches,

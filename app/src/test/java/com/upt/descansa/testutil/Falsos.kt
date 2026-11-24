@@ -6,6 +6,7 @@ import com.upt.descansa.domain.model.Epoca
 import com.upt.descansa.domain.model.MotivoDisparo
 import com.upt.descansa.domain.model.NocheActiva
 import com.upt.descansa.domain.model.TipoSimulacion
+import com.upt.descansa.domain.repository.ControlNoMolestar
 import com.upt.descansa.domain.repository.ControlServicioNocturno
 import com.upt.descansa.domain.repository.NocheRepository
 import com.upt.descansa.domain.repository.ProgramadorAlarma
@@ -44,6 +45,24 @@ class ControlServicioNocturnoFalso : ControlServicioNocturno {
 
     override fun detener() {
         corriendo = false
+    }
+}
+
+/** No molestar FALSO: anota si está activo. */
+class ControlNoMolestarFalso(var permiso: Boolean = true) : ControlNoMolestar {
+    var activo = false
+        private set
+
+    override fun tienePermiso() = permiso
+
+    override fun activar(): Boolean {
+        if (!permiso) return false
+        activo = true
+        return true
+    }
+
+    override fun restaurar() {
+        activo = false
     }
 }
 

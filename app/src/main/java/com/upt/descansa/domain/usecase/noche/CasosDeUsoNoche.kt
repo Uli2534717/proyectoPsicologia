@@ -4,6 +4,7 @@ import com.upt.descansa.core.util.proximaOcurrencia
 import com.upt.descansa.domain.model.MotivoDisparo
 import com.upt.descansa.domain.model.TipoSimulacion
 import com.upt.descansa.domain.repository.AjustesRepository
+import com.upt.descansa.domain.repository.ControlNoMolestar
 import com.upt.descansa.domain.repository.ControlServicioNocturno
 import com.upt.descansa.domain.repository.NocheRepository
 import com.upt.descansa.domain.repository.ProgramadorAlarma
@@ -12,7 +13,7 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 
 // =============================================================================
-//  Casos de uso de la noche (Fases 1 y 2).
+//  Casos de uso de la noche (Fases 1 a 3).
 //  Reciben la hora "ahora" como parámetro para que las pruebas no dependan
 //  del reloj real de la computadora.
 // =============================================================================
@@ -28,6 +29,7 @@ class ActivarModoNocheUseCase @Inject constructor(
     private val nocheRepositorio: NocheRepository,
     private val programador: ProgramadorAlarma,
     private val servicio: ControlServicioNocturno,
+    private val noMolestar: ControlNoMolestar,
 ) {
     suspend operator fun invoke(ahora: ZonedDateTime = ZonedDateTime.now()): Long {
         val ajustes = ajustesRepositorio.ajustes.first()
@@ -37,6 +39,8 @@ class ActivarModoNocheUseCase @Inject constructor(
         programador.programar(horaLimiteEn)
         nocheRepositorio.iniciar(ahora.toInstant().toEpochMilli(), horaLimiteEn, ajustes)
         servicio.iniciar()
+        // Sin permiso devuelve false y la noche sigue igual (el modo noche lo avisa).
+        if (ajustes.noMolestarActivado) noMolestar.activar()
         return horaLimiteEn
     }
 }
@@ -50,6 +54,7 @@ class IniciarSimulacionUseCase @Inject constructor(
     private val nocheRepositorio: NocheRepository,
     private val programador: ProgramadorAlarma,
     private val servicio: ControlServicioNocturno,
+    private val noMolestar: ControlNoMolestar,
 ) {
     suspend operator fun invoke(tipo: TipoSimulacion, ahora: Long = System.currentTimeMillis()) {
         val ajustes = ajustesRepositorio.ajustes.first().copy(ventanaMinutos = VENTANA_SIMULADA)
@@ -57,6 +62,7 @@ class IniciarSimulacionUseCase @Inject constructor(
         programador.programar(horaLimiteEn)
         nocheRepositorio.iniciar(ahora, horaLimiteEn, ajustes)
         servicio.iniciar(tipo)
+        if (ajustes.noMolestarActivado) noMolestar.activar()
     }
 
     companion object {
@@ -70,9 +76,11 @@ class DetenerModoNocheUseCase @Inject constructor(
     private val nocheRepositorio: NocheRepository,
     private val programador: ProgramadorAlarma,
     private val servicio: ControlServicioNocturno,
+    private val noMolestar: ControlNoMolestar,
 ) {
     suspend operator fun invoke(ahora: Long = System.currentTimeMillis()) {
         servicio.detener()
+        noMolestar.restaurar()
         programador.cancelar()
         nocheRepositorio.terminarActiva(ahora, MotivoDisparo.DETENIDA_MANUALMENTE, disparadaEn = null)
     }
@@ -89,9 +97,12 @@ class ApagarAlarmaUseCase @Inject constructor(
     private val nocheRepositorio: NocheRepository,
     private val programador: ProgramadorAlarma,
     private val servicio: ControlServicioNocturno,
+    private val noMolestar: ControlNoMolestar,
 ) {
     suspend operator fun invoke(disparadaEn: Long, ahora: Long = System.currentTimeMillis()) {
         servicio.detener()
+        // Ya despertó: el teléfono vuelve a sonar como siempre.
+        noMolestar.restaurar()
         programador.cancelar()
         val disparo = nocheRepositorio.disparoRegistrado()
         nocheRepositorio.terminarActiva(
