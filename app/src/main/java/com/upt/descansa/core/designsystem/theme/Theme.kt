@@ -15,14 +15,14 @@ import androidx.core.view.WindowCompat
 import com.upt.descansa.domain.model.ModoTema
 
 /**
- * Tema claro "Cartel sereno": lienzo blanco, texto carbón, verde como único color interactivo.
+ * Tema claro "Cartel sereno": lienzo blanco, texto carbón, morado como único color interactivo.
  * Todas las superficies son BLANCAS: sin grises de fondo ni elevación tonal.
  */
 private val EsquemaClaro = lightColorScheme(
-    primary = VerdeBosque,
+    primary = MoradoProfundo,
     onPrimary = BlancoLienzo,
     primaryContainer = BlancoLienzo,
-    onPrimaryContainer = VerdeBosque,
+    onPrimaryContainer = MoradoProfundo,
     secondary = AzulCartel,
     onSecondary = BlancoLienzo,
     tertiary = TurquesaSereno,
@@ -46,34 +46,34 @@ private val EsquemaClaro = lightColorScheme(
 )
 
 /**
- * Tema nocturno derivado: verde casi negro, texto hueso y TURQUESA como color
- * interactivo (el verde bosque no tendría contraste sobre fondo oscuro).
+ * Tema nocturno derivado: morado casi negro, texto hueso y LAVANDA como color
+ * interactivo (el morado profundo no tendría contraste sobre fondo oscuro).
  */
 private val EsquemaNocturno = darkColorScheme(
-    primary = TurquesaSereno,
-    onPrimary = VerdeNoche,
-    primaryContainer = VerdeNoche,
-    onPrimaryContainer = TurquesaSereno,
+    primary = LavandaNoche,
+    onPrimary = MoradoNoche,
+    primaryContainer = MoradoNoche,
+    onPrimaryContainer = LavandaNoche,
     secondary = AzulNoche,
-    onSecondary = VerdeNoche,
+    onSecondary = MoradoNoche,
     tertiary = TurquesaSereno,
-    onTertiary = VerdeNoche,
-    background = VerdeNoche,
+    onTertiary = MoradoNoche,
+    background = MoradoNoche,
     onBackground = TextoNoche,
-    surface = VerdeNoche,
+    surface = MoradoNoche,
     onSurface = TextoNoche,
-    surfaceVariant = VerdeNoche,
+    surfaceVariant = MoradoNoche,
     onSurfaceVariant = TextoNoche,
-    surfaceContainerLowest = VerdeNoche,
-    surfaceContainerLow = VerdeNoche,
-    surfaceContainer = VerdeNoche,
-    surfaceContainerHigh = VerdeNoche,
-    surfaceContainerHighest = VerdeNoche,
-    surfaceTint = VerdeNoche,
+    surfaceContainerLowest = MoradoNoche,
+    surfaceContainerLow = MoradoNoche,
+    surfaceContainer = MoradoNoche,
+    surfaceContainerHigh = MoradoNoche,
+    surfaceContainerHighest = MoradoNoche,
+    surfaceTint = MoradoNoche,
     outline = TextoNoche,
     outlineVariant = TextoNoche,
     error = AmarilloMantequilla,
-    onError = VerdeNoche,
+    onError = MoradoNoche,
 )
 
 /** Material usa estas formas en diálogos y campos; las limitamos a las permitidas. */

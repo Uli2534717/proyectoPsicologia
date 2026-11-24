@@ -246,3 +246,15 @@ Se confirmarán con la documentación oficial vigente antes de implementarlas:
   |a|/g por minuto.
 - **Fase 3:** comportamiento de los "Modos" de Android 15+ frente a
   `setInterruptionFilter`.
+
+## D-21 · Morado en lugar de verde
+
+**Qué:** el equipo pidió que la interfaz fuera morada en lugar de verde:
+- Interactivo del tema claro: `MoradoProfundo` #4B2E83 (antes VerdeBosque).
+- Fondo nocturno: `MoradoNoche` #160F26 (antes verde casi negro).
+- Interactivo nocturno: `LavandaNoche` #B9A8FF (antes turquesa).
+
+**Por qué estos tonos:** conservan el contraste de la guía. El morado sobre
+blanco da ≈10:1 y la lavanda sobre el fondo nocturno ≈9:1 (mínimo pedido:
+4.5:1). Además, el morado recuerda la lavanda del prototipo original.
+Turquesa y amarillo siguen siendo SOLO decorativos (palabras gigantes y separadores).

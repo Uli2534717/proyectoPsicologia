@@ -136,7 +136,7 @@ fun MananaScreen(onVolverAlInicio: () -> Unit) {
 
 /**
  * Movimiento por minuto como LÍNEAS verticales de contorno (sin rellenos de
- * área): verde el resto de la noche y azul el minuto en que sonó la alarma.
+ * área): morado el resto de la noche y azul el minuto en que sonó la alarma.
  * Se dibuja de izquierda a derecha en 600 ms; con animaciones reducidas, de golpe.
  */
 @Composable

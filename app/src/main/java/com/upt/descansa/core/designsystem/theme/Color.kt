@@ -7,7 +7,8 @@ import androidx.compose.ui.graphics.Color
 // =============================================================================
 //  Paleta "Cartel sereno". ÚNICA fuente de colores de la app.
 //  Reglas (ver CLAUDE.md → Sistema de diseño):
-//  - VerdeBosque es el ÚNICO color interactivo (en tema claro).
+//  - MoradoProfundo es el ÚNICO color interactivo (en tema claro);
+//    LavandaNoche lo es en el tema nocturno.
 //  - AzulCartel solo en bordes y subrayados de acciones secundarias, nunca relleno.
 //  - Turquesa y amarillo son DECORATIVOS: palabras gigantes y separadores.
 //    Nunca en texto funcional menor a 32 sp.
@@ -15,7 +16,12 @@ import androidx.compose.ui.graphics.Color
 // =============================================================================
 
 // --- Tema claro ---
-val VerdeBosque = Color(0xFF035542)
+/**
+ * Morado profundo: color interactivo del tema claro (botones, enlaces,
+ * etiquetas, íconos activos). Contraste ≈10:1 sobre blanco.
+ * Reemplaza al verde de la guía original (pedido del equipo, D-21).
+ */
+val MoradoProfundo = Color(0xFF4B2E83)
 val AzulCartel = Color(0xFF2B7BB9)
 val TurquesaSereno = Color(0xFF56DDDB)
 val AmarilloMantequilla = Color(0xFFF9E9A9)
@@ -23,15 +29,18 @@ val GrisCarbon = Color(0xFF333333)
 val BlancoLienzo = Color(0xFFFFFFFF)
 
 // --- Tema nocturno (derivado con las mismas reglas) ---
-/** Fondo nocturno: verde casi negro. */
-val VerdeNoche = Color(0xFF0B1F19)
+/** Fondo nocturno: morado casi negro. */
+val MoradoNoche = Color(0xFF160F26)
+
+/** Color interactivo del tema nocturno: lavanda clara, ≈9:1 sobre MoradoNoche. */
+val LavandaNoche = Color(0xFFB9A8FF)
 
 /** Texto nocturno: blanco hueso, menos agresivo que el blanco puro de noche. */
 val TextoNoche = Color(0xFFF2F2EC)
 
 /**
  * Azul secundario aclarado para fondo nocturno. SUPOSICIÓN: el prompt no define
- * el azul nocturno; AzulCartel sobre VerdeNoche da ≈3.7:1, poco para un borde
+ * el azul nocturno; AzulCartel sobre MoradoNoche da ≈3.6:1, poco para un borde
  * fino. Este da ≈7:1 (ver DECISIONES.md D-18).
  */
 val AzulNoche = Color(0xFF8CC0EA)

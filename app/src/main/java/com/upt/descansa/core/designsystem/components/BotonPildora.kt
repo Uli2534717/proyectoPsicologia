@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.upt.descansa.core.designsystem.theme.Formas
 
 /**
- * Botón PRINCIPAL de la pantalla, con forma de píldora y contorno verde.
+ * Botón PRINCIPAL de la pantalla, con forma de píldora y contorno morado.
  * Regla: solo UNO por pantalla, para la acción más importante
  * ("Preparar mi noche", "Activar modo noche", "Detener").
  */

@@ -134,13 +134,13 @@ nombres, logotipos, textos ni imágenes de esa marca**.
 ### Colores (`theme/Color.kt`)
 | Token | Hex | Uso |
 |---|---|---|
-| `VerdeBosque` | #035542 | ÚNICO color interactivo (tema claro): botones, enlaces, etiquetas, íconos activos |
+| `MoradoProfundo` | #4B2E83 | ÚNICO color interactivo (tema claro): botones, enlaces, etiquetas, íconos activos |
 | `AzulCartel` | #2B7BB9 | Solo bordes y subrayados de acciones secundarias. Nunca relleno |
-| `TurquesaSereno` | #56DDDB | Decorativo (palabras gigantes, separadores). Interactivo en tema nocturno |
+| `TurquesaSereno` | #56DDDB | Solo decorativo (palabras gigantes de noche, separadores) |
 | `AmarilloMantequilla` | #F9E9A9 | Solo decorativo |
 | `GrisCarbon` | #333333 | Texto y bordes |
 | `BlancoLienzo` | #FFFFFF | Fondo de todo |
-| Nocturno | #0B1F19 / #F2F2EC | Fondo / texto del tema nocturno |
+| Nocturno | #160F26 / #F2F2EC / #B9A8FF | Fondo (`MoradoNoche`) / texto / interactivo (`LavandaNoche`) |
 
 - Colores decorativos: `LocalColoresCartel.current` (turquesa = noche: Pendientes,
   Respiración, Relajación, Sonidos, Alarma, Modo noche; amarillo = día: Bienvenida,

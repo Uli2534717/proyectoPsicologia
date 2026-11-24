@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- VerdeNoche de core/designsystem/theme/Color.kt (tema nocturno). -->
-    <color name="fondo">#FF0B1F19</color>
+    <!-- MoradoNoche de core/designsystem/theme/Color.kt (tema nocturno). -->
+    <color name="fondo">#FF160F26</color>
 </resources>

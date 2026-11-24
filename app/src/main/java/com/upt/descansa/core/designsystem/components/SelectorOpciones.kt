@@ -55,7 +55,7 @@ fun <T> SelectorOpciones(
 
 /**
  * Una opción seleccionable con contorno y esquinas de 20 dp.
- * La elegida lleva borde verde de 2.5 dp Y una ✓: nunca se indica solo con
+ * La elegida lleva borde morado de 2.5 dp Y una ✓: nunca se indica solo con
  * color ni con relleno (regla del sistema).
  */
 @Composable
