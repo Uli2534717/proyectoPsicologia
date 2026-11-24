@@ -34,6 +34,14 @@ distintas** (sección 15 del documento).
 Preparación: Ajustes de la app → activar **Modo desarrollador** → aparece
 **"Probar alarma en 2 minutos"**.
 
+> **Resultado en emulador (Pixel 9a, API 37, 24/11/2026):** ✅ con pantalla
+> bloqueada se encendió sola y mostró la pantalla de timbre; audio `USAGE_ALARM`
+> sonando; servicio iniciado por la exención `ALARM_MANAGER_ALARM_CLOCK`.
+> ✅ Posponer reprogramó +5 min. ✅ Tras reiniciar, la alarma se reprogramó
+> sola y, como su hora pasó con el teléfono apagado, sonó al arrancar.
+> ✅ Detener desde la notificación apagó sonido y servicio.
+> Falta: repetir en dos teléfonos reales (con PIN) y las pruebas de abajo.
+
 - [ ] **Permisos en contexto:** la primera vez que se pulsa "Activar modo
       noche" aparece la explicación de notificaciones ANTES del diálogo de Android.
 - [ ] **Modo noche** muestra "Alarma de respaldo a las HH:mm" con la hora real.
