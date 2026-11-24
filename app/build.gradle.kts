@@ -13,13 +13,13 @@ plugins {
 }
 
 android {
-    namespace = "com.upt.dormirbien"
+    namespace = "com.upt.descansa"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.upt.dormirbien"
+        applicationId = "com.upt.descansa"
         // minSdk 28 (Android 9): mínimo que pide Health Connect.
         minSdk = 28
         targetSdk = 37
@@ -64,6 +64,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)

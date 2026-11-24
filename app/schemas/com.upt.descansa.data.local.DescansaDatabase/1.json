@@ -1,0 +1,269 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "4f3d7ded6fa279e5699b977c46258e4f",
+    "entities": [
+      {
+        "tableName": "noches",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `iniciada_en` INTEGER NOT NULL, `terminada_en` INTEGER, `hora_limite_en` INTEGER NOT NULL, `ventana_minutos` INTEGER NOT NULL, `fuente` TEXT NOT NULL, `disparada_en` INTEGER, `motivo_disparo` TEXT NOT NULL, `no_molestar_activado` INTEGER NOT NULL, `sonido_id` TEXT, `inicio_sueno_estimado_en` INTEGER, `sensacion` INTEGER, `version_motor` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "iniciadaEn",
+            "columnName": "iniciada_en",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "terminadaEn",
+            "columnName": "terminada_en",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "horaLimiteEn",
+            "columnName": "hora_limite_en",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ventanaMinutos",
+            "columnName": "ventana_minutos",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fuente",
+            "columnName": "fuente",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "disparadaEn",
+            "columnName": "disparada_en",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "motivoDisparo",
+            "columnName": "motivo_disparo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noMolestarActivado",
+            "columnName": "no_molestar_activado",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sonidoId",
+            "columnName": "sonido_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "inicioSuenoEstimadoEn",
+            "columnName": "inicio_sueno_estimado_en",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sensacion",
+            "columnName": "sensacion",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "versionMotor",
+            "columnName": "version_motor",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "epocas",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`noche_id` INTEGER NOT NULL, `minuto_ts` INTEGER NOT NULL, `actividad` REAL NOT NULL, `frecuencia_cardiaca` INTEGER, `marca` TEXT NOT NULL, PRIMARY KEY(`noche_id`, `minuto_ts`), FOREIGN KEY(`noche_id`) REFERENCES `noches`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "nocheId",
+            "columnName": "noche_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "minutoTs",
+            "columnName": "minuto_ts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actividad",
+            "columnName": "actividad",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frecuenciaCardiaca",
+            "columnName": "frecuencia_cardiaca",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "marca",
+            "columnName": "marca",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "noche_id",
+            "minuto_ts"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "noches",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "noche_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pendientes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `noche_id` INTEGER, `texto` TEXT NOT NULL, `hecho` INTEGER NOT NULL, `creado_en` INTEGER NOT NULL, `hecho_en` INTEGER, FOREIGN KEY(`noche_id`) REFERENCES `noches`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nocheId",
+            "columnName": "noche_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "texto",
+            "columnName": "texto",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hecho",
+            "columnName": "hecho",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creado_en",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hechoEn",
+            "columnName": "hecho_en",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pendientes_noche_id",
+            "unique": false,
+            "columnNames": [
+              "noche_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pendientes_noche_id` ON `${TABLE_NAME}` (`noche_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "noches",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "noche_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "estadisticas_sonido",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sonido_id` TEXT NOT NULL, `reproducciones` INTEGER NOT NULL, `es_favorito` INTEGER NOT NULL, `latencia_promedio_min` REAL, `apagados_completos` INTEGER NOT NULL, `ultima_reproduccion_en` INTEGER, PRIMARY KEY(`sonido_id`))",
+        "fields": [
+          {
+            "fieldPath": "sonidoId",
+            "columnName": "sonido_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reproducciones",
+            "columnName": "reproducciones",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "esFavorito",
+            "columnName": "es_favorito",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latenciaPromedioMin",
+            "columnName": "latencia_promedio_min",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "apagadosCompletos",
+            "columnName": "apagados_completos",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ultimaReproduccionEn",
+            "columnName": "ultima_reproduccion_en",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sonido_id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4f3d7ded6fa279e5699b977c46258e4f')"
+    ]
+  }
+}

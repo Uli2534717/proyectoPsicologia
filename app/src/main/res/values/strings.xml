@@ -1,71 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Textos de la app. REGLA DEL EQUIPO: ningún texto visible se escribe
-    directo en el código Kotlin; todo va aquí y se usa con stringResource(...).
-    Usa el prefijo de tu módulo (sonidos_, alarma_, ...) para evitar choques
-    y conflictos de Git.
+    Textos de Descansa (español de México). REGLA: ningún texto visible se
+    escribe en el código Kotlin; todo va aquí con el prefijo de su pantalla.
+    Tono: amable, neutro, sin presión ni culpas (parte del público es menor de edad).
 -->
 <resources>
-    <string name="app_name">DormirBien</string>
+    <string name="app_name">Descansa</string>
 
     <!-- Comunes -->
-    <string name="en_construccion">Próximamente</string>
+    <string name="accion_atras">Regresar</string>
+    <string name="accion_ajustes">Ajustes</string>
+    <string name="accion_cancelar">Cancelar</string>
+    <string name="paso_n_de_total">Paso %1$d de %2$d</string>
+    <string name="paso_omitir">Omitir paso</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="anterior">Anterior</string>
+    <string name="continuar">Continuar</string>
+    <string name="duracion">Duración</string>
+    <string name="minutos_corto">%1$d min</string>
+    <string name="aviso_no_medico">Esta app no sustituye la atención médica. Si tienes problemas de sueño persistentes, consulta a un profesional de la salud.</string>
 
-    <!-- Barra de navegación inferior -->
+    <!-- Barra inferior -->
     <string name="nav_inicio">Inicio</string>
-    <string name="nav_sonidos">Sonidos</string>
-    <string name="nav_alarma">Alarma</string>
-    <string name="nav_emociones">Emociones</string>
-    <string name="nav_ajustes">Ajustes</string>
+    <string name="nav_noche">Noche</string>
+    <string name="nav_despertar">Despertar</string>
+    <string name="nav_aprender">Aprender</string>
 
-    <!-- Inicio -->
+    <!-- 1. Bienvenida -->
+    <string name="bienvenida_valor">Dormir bien cambia cómo piensas, cómo te sientes y cómo rindes. Te acompañamos antes de dormir, durante la noche y al despertar.</string>
+    <string name="bienvenida_permisos">Permisos que necesitamos</string>
+    <string name="permiso_notificaciones">Notificaciones</string>
+    <string name="permiso_notificaciones_motivo">Para recordarte tu rutina nocturna.</string>
+    <string name="permiso_alarmas">Alarmas exactas</string>
+    <string name="permiso_alarmas_motivo">Para que tu alarma suene a tiempo.</string>
+    <string name="permiso_sensores">Sensores de movimiento</string>
+    <string name="permiso_sensores_motivo">Para detectar tu sueño ligero.</string>
+    <string name="permiso_no_molestar">No molestar</string>
+    <string name="permiso_no_molestar_motivo">Para silenciar notificaciones al dormir.</string>
+    <string name="bienvenida_privacidad">Tus datos se guardan solo en este teléfono. Sin cuentas, sin anuncios. Puedes borrarlos cuando quieras.</string>
+    <string name="bienvenida_cambiar_permisos">Puedes cambiar los permisos cuando quieras en Ajustes.</string>
+    <string name="bienvenida_comenzar">Comenzar</string>
+
+    <!-- 2. Inicio -->
     <string name="inicio_saludo">Buenas noches</string>
-    <string name="inicio_subtitulo">¿Qué te gustaría hacer antes de dormir?</string>
+    <string name="inicio_subtitulo">¿Listo para descansar?</string>
+    <string name="inicio_ultima_noche">Tu última noche</string>
+    <string name="inicio_horas_minutos">%1$d h %2$d min</string>
+    <string name="inicio_de_sueno">de sueño</string>
+    <string name="inicio_te_dormiste">Te dormiste</string>
+    <string name="inicio_despertaste">Despertaste</string>
+    <string name="inicio_sin_noches">Aún no hay noches registradas. Cuando prepares tu primera noche, aquí verás un resumen.</string>
+    <string name="inicio_preparar_noche">Preparar mi noche</string>
+    <string name="inicio_herramientas">Herramientas</string>
+    <string name="herramienta_pendientes">Pendientes</string>
+    <string name="herramienta_respiracion">Respiración</string>
+    <string name="herramienta_relajacion">Relajación</string>
+    <string name="herramienta_sonidos">Sonidos</string>
+    <string name="herramienta_alarma">Alarma inteligente</string>
+    <string name="herramienta_no_molestar">No molestar</string>
 
-    <!-- Onboarding -->
-    <string name="onboarding_titulo">Bienvenida</string>
-    <string name="onboarding_descripcion">Conoce la app, revisa el aviso de privacidad y configura tu meta de sueño.</string>
+    <!-- 3. Pendientes -->
+    <string name="pendientes_titulo">Saca los pendientes de tu cabeza</string>
+    <string name="pendientes_subtitulo">Escríbelos aquí. Ya quedan anotados y puedes soltarlos hasta mañana.</string>
+    <string name="pendientes_campo">¿Qué te preocupa o debes hacer mañana?</string>
+    <string name="pendientes_agregar">Agregar pendiente</string>
+    <string name="pendientes_tranquilizador">Ya está anotado. Tu mente puede soltarlo hasta mañana; mañana lo verás en tu resumen.</string>
+    <string name="pendientes_boton">Dejarlo para mañana</string>
 
-    <!-- Vaciado mental -->
-    <string name="vaciado_titulo">Vaciado mental</string>
-    <string name="vaciado_descripcion">Escribe lo que te preocupa y lo que puedes dejar para mañana.</string>
+    <!-- 4. Respiración -->
+    <string name="respiracion_titulo">Respira con calma</string>
+    <string name="respiracion_subtitulo">Sigue el círculo: crece al inhalar y se encoge al exhalar.</string>
+    <string name="respiracion_inhala_exhala">Inhala · Exhala</string>
+    <string name="respiracion_pausar">Pausar</string>
+    <string name="respiracion_reanudar">Reanudar</string>
 
-    <!-- Diario de sueño -->
-    <string name="diario_sueno_titulo">Diario de sueño</string>
-    <string name="diario_sueno_descripcion">Registra a qué hora te acostaste, a qué hora despertaste y cómo dormiste.</string>
+    <!-- 5. Relajación -->
+    <string name="relajacion_titulo">Relaja tu cuerpo</string>
+    <string name="relajacion_subtitulo">Vamos grupo por grupo: tensa unos segundos y suelta.</string>
+    <string name="relajacion_grupo_n_de_total">%1$s · %2$d de %3$d</string>
+    <string name="relajacion_pies">Pies</string>
+    <string name="relajacion_piernas">Piernas</string>
+    <string name="relajacion_abdomen">Abdomen</string>
+    <string name="relajacion_manos">Manos</string>
+    <string name="relajacion_hombros">Hombros</string>
+    <string name="relajacion_rostro">Rostro</string>
+    <string name="relajacion_instr_pies">Encoge los dedos de los pies durante 5 segundos. Luego suéltalos y nota la diferencia.</string>
+    <string name="relajacion_instr_piernas">Tensa los músculos de las piernas durante 5 segundos. Luego suéltalos y nota la diferencia.</string>
+    <string name="relajacion_instr_abdomen">Aprieta el abdomen durante 5 segundos. Luego suéltalo y nota la diferencia.</string>
+    <string name="relajacion_instr_manos">Cierra las manos en puño durante 5 segundos. Luego ábrelas y nota la diferencia.</string>
+    <string name="relajacion_instr_hombros">Sube los hombros hacia las orejas durante 5 segundos. Luego bájalos y nota la diferencia.</string>
+    <string name="relajacion_instr_rostro">Aprieta suavemente los ojos y la mandíbula durante 5 segundos. Luego suéltalos y nota la diferencia.</string>
+    <string name="relajacion_seguridad">Tensa sin dolor. Si algo molesta, omite ese grupo.</string>
+    <string name="relajacion_figura">Figura del cuerpo con %1$s resaltado</string>
 
-    <!-- Sonidos -->
-    <string name="sonidos_titulo">Sonidos relajantes</string>
-    <string name="sonidos_descripcion">Mezcla lluvia, olas, ruido blanco y más, con temporizador de apagado.</string>
+    <!-- 6. Sonidos -->
+    <string name="sonidos_titulo">Elige tu sonido</string>
+    <string name="sonidos_recomendado">Recomendado para ti</string>
+    <string name="sonidos_recomendado_motivo">Según los sonidos que más guardas.</string>
+    <string name="sonidos_reproducir">Reproducir %1$s</string>
+    <string name="sonidos_favorito">Marcar %1$s como favorito</string>
+    <string name="sonidos_volumen">Volumen</string>
+    <string name="sonidos_apagado_gradual">Apagado gradual</string>
+    <string name="sonido_lluvia">Lluvia suave</string>
+    <string name="sonido_ruido_blanco">Ruido blanco</string>
+    <string name="sonido_olas">Olas del mar</string>
+    <string name="sonido_bosque">Bosque de noche</string>
 
-    <!-- Alarma -->
+    <!-- 7. Alarma -->
     <string name="alarma_titulo">Alarma inteligente</string>
-    <string name="alarma_descripcion">Te despierta en una fase de sueño ligero, dentro de la ventana que elijas.</string>
+    <string name="alarma_hora_limite">Hora límite</string>
+    <string name="alarma_puede_sonar_desde">Puede sonar desde las %1$s</string>
+    <string name="alarma_ventana">Ventana de despertar</string>
+    <string name="alarma_fuente">Fuente de datos</string>
+    <string name="alarma_fuente_telefono">Acelerómetro del teléfono</string>
+    <string name="alarma_fuente_telefono_detalle">Detecta tu movimiento sobre el colchón.</string>
+    <string name="alarma_fuente_reloj">Smartwatch</string>
+    <string name="alarma_fuente_reloj_detalle">Movimiento y frecuencia cardíaca.</string>
+    <string name="alarma_respaldo">Si no detectamos sueño ligero, sonará a la hora límite.</string>
+    <string name="alarma_no_molestar_detalle">Las alarmas seguirán sonando.</string>
+    <string name="alarma_activar">Activar modo noche</string>
+    <string name="alarma_cambiar_hora">Cambiar hora límite</string>
 
-    <!-- Emociones -->
-    <string name="emociones_titulo">Registro emocional</string>
-    <string name="emociones_descripcion">Anota tu estado de ánimo y tu nivel de estrés de cada día.</string>
+    <!-- 8. Modo noche -->
+    <string name="modo_noche_activo">Modo noche activo</string>
+    <string name="modo_noche_rango">%1$s – %2$s</string>
+    <string name="modo_noche_a_mas_tardar">Sonará a más tardar a las %1$s.</string>
+    <string name="modo_noche_no_molestar">No molestar activo</string>
+    <string name="modo_noche_respaldo">Alarma de respaldo a las %1$s</string>
+    <string name="modo_noche_fuente">Fuente: %1$s</string>
+    <string name="modo_noche_sonido">Sonido: %1$s, se apaga en %2$d min</string>
+    <string name="modo_noche_colchon">Deja el teléfono sobre el colchón, cerca de ti.</string>
+    <string name="modo_noche_detener">Detener</string>
+    <string name="modo_noche_confirmar_titulo">¿Detener el modo noche?</string>
+    <string name="modo_noche_confirmar_texto">Se cancelará la alarma inteligente y la de respaldo.</string>
 
-    <!-- Estadísticas -->
-    <string name="estadisticas_titulo">Estadísticas</string>
-    <string name="estadisticas_descripcion">Mira cómo se relacionan tu sueño y tu estado de ánimo. Es una correlación, no un diagnóstico.</string>
+    <!-- 9. Mañana -->
+    <string name="manana_saludo">Buenos días</string>
+    <string name="manana_subtitulo">Así fue tu noche.</string>
+    <string name="manana_alarma_sono">Alarma sonó a las %1$s</string>
+    <string name="manana_motivo_sueno_ligero">Detectamos sueño ligero</string>
+    <string name="manana_motivo_hora_limite">Sonó a la hora límite</string>
+    <string name="manana_dormiste">Dormiste %1$s en total.</string>
+    <string name="manana_movimiento">Movimiento durante la noche</string>
+    <string name="manana_grafica_descripcion">Gráfica de barras del movimiento por minuto. Hubo más movimiento cerca de la hora de despertar.</string>
+    <string name="manana_pendientes">Pendientes de anoche</string>
+    <string name="manana_como_te_sientes">¿Cómo te sientes?</string>
+    <string name="manana_agotado">Agotado</string>
+    <string name="manana_muy_bien">Muy bien</string>
+    <string name="manana_volver">Volver al inicio</string>
+    <string name="manana_ejemplo">Datos de ejemplo: el resumen real aparecerá después de tu primera noche.</string>
 
-    <!-- Aprende -->
-    <string name="aprende_titulo">Aprende sobre el sueño</string>
-    <string name="aprende_descripcion">Tarjetas cortas sobre las fases del sueño, la higiene del sueño y la salud mental.</string>
+    <!-- 10. Aprender -->
+    <string name="aprender_titulo">Aprende sobre el sueño</string>
+    <string name="aprender_consejo_hoy">Consejo de hoy</string>
+    <string name="aprender_consejo_texto">Intenta acostarte y levantarte a la misma hora, incluso en fin de semana.</string>
+    <string name="aprender_por_que">Por qué dormir bien importa</string>
+    <string name="aprender_por_que_detalle">Cómo influye en la memoria, el ánimo y la atención.</string>
+    <string name="aprender_etapas">Las etapas del sueño</string>
+    <string name="aprender_etapas_detalle">Ligero, profundo y REM: qué hace cada una.</string>
+    <string name="aprender_habitos">Hábitos para dormir mejor</string>
+    <string name="aprender_habitos_detalle">Cambios simples en tu rutina y tu cuarto.</string>
+    <string name="aprender_mente">Cuando la mente no para</string>
+    <string name="aprender_mente_detalle">Qué es la rumiación y cómo bajarle el volumen.</string>
 
-    <!-- Respiración -->
-    <string name="respiracion_titulo">Respiración guiada</string>
-    <string name="respiracion_descripcion">Ejercicios 4-7-8 y respiración de caja para relajarte.</string>
-
-    <!-- Rutina -->
-    <string name="rutina_titulo">Rutina nocturna</string>
-    <string name="rutina_descripcion">Tu lista de pasos antes de dormir y tu racha de días cumplidos.</string>
-
-    <!-- Ajustes -->
+    <!-- 11. Ajustes -->
     <string name="ajustes_titulo">Ajustes</string>
-    <string name="ajustes_tema">Tema</string>
-    <string name="ajustes_tema_oscuro">Oscuro (recomendado de noche)</string>
-    <string name="ajustes_tema_claro">Claro</string>
-    <string name="ajustes_tema_sistema">Igual que el teléfono</string>
+    <string name="ajustes_permisos">Permisos</string>
+    <string name="ajustes_alarma">Alarma</string>
+    <string name="ajustes_sensibilidad">Sensibilidad de la alarma</string>
+    <string name="ajustes_sensibilidad_baja">Baja</string>
+    <string name="ajustes_sensibilidad_media">Media</string>
+    <string name="ajustes_sensibilidad_alta">Alta</string>
+    <string name="ajustes_posponer">Posponer</string>
+    <string name="ajustes_datos">Datos y privacidad</string>
+    <string name="ajustes_exportar">Exportar mis datos</string>
+    <string name="ajustes_borrar">Borrar todos mis datos</string>
+    <string name="ajustes_privacidad">Aviso de privacidad</string>
+    <string name="ajustes_creditos">Créditos</string>
+    <string name="ajustes_desarrollador">Modo desarrollador</string>
+    <string name="ajustes_proximamente">Disponible en una próxima fase.</string>
 </resources>

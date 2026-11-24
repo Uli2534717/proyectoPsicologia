@@ -1,4 +1,4 @@
-# Cómo contribuir a DormirBien
+# Cómo contribuir a Descansa
 
 Guía paso a paso para trabajar en equipo sin pisarnos.
 
@@ -64,7 +64,7 @@ Ejemplos:
 feat(alarma): agrega ventana de despertar
 fix(sonidos): corrige fade-out que no bajaba el volumen
 docs(readme): agrega capturas de inicio
-test(emociones): agrega pruebas del ViewModel
+test(alarma): agrega pruebas del motor de decisión
 refactor(core): mueve colores a Color.kt
 chore(deps): actualiza Room a 2.8.5
 ```
@@ -72,7 +72,7 @@ chore(deps): actualiza Room a 2.8.5
 Tipos: `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `chore`.
 
 ```bash
-git add app/src/main/java/com/upt/dormirbien/feature/sonidos
+git add app/src/main/java/com/upt/descansa/feature/noche/sonidos
 git commit -m "feat(sonidos): agrega biblioteca de sonidos"
 ```
 
@@ -138,8 +138,8 @@ Pasos:
 | Archivo | Cómo evitarlo |
 |---|---|
 | `strings.xml` | Agrega tus textos en el bloque de tu módulo, con su prefijo |
-| `DormirBienNavegacion.kt` | Toca solo la línea `composable<...>` de tu módulo |
-| `DormirBienDatabase.kt` | Avisa en el grupo antes de subir la `version` |
+| `DescansaNavegacion.kt` | Toca solo la línea `composable<...>` de tu módulo |
+| `DescansaDatabase.kt` | Avisa en el grupo antes de subir la `version` |
 | `libs.versions.toml` | Agrega librerías al final de su sección |
 | `DataModule.kt` | Agrega tu `@Binds` al final |
 

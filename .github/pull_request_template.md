@@ -4,7 +4,7 @@
 
 ## Módulo
 
-<!-- Ej.: sonidos, alarma, emociones, core, data... -->
+<!-- Ej.: alarma, sonidos, pendientes, core, data... -->
 
 ## Issue relacionado
 

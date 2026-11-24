@@ -4,11 +4,11 @@
 
     <!--
         android:name: clase Application con @HiltAndroidApp (activa Hilt).
-        android:allowBackup="false": por privacidad, los datos (diario,
-        emociones) NO se copian a la nube de Google; viven solo en el teléfono.
+        android:allowBackup="false": por privacidad, los datos (noches,
+        pendientes) NO se copian a la nube de Google; viven solo en el teléfono.
     -->
     <application
-        android:name=".DormirBienApp"
+        android:name=".DescansaApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,12 +16,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.DormirBien">
+        android:theme="@style/Theme.Descansa">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.DormirBien"
+            android:theme="@style/Theme.Descansa"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,23 +1,27 @@
 # Créditos y licencias
 
-Todos los recursos de terceros (audios, imágenes, fuentes) deben aparecer aquí
-**antes** de subirlos al repositorio. Solo se aceptan licencias que permitan
-uso y redistribución: preferentemente **CC0** (dominio público) o **CC BY**
-(con atribución).
+Todos los recursos de terceros deben aparecer aquí **antes** de subirse al
+repositorio, y también en la app (Ajustes → Créditos). Solo se aceptan licencias
+que permitan uso y redistribución: preferentemente **CC0** o **CC BY**.
 
-## Sonidos
+## Sonidos (`app/src/main/res/raw/` o `assets/sounds/`)
 
-> Los ruidos blanco, rosa y marrón se generan por código (sin archivo de audio),
-> así que no requieren licencia.
-
-| Archivo en `res/raw/` | Descripción | Autor | Fuente (URL) | Licencia |
+| Archivo | Nombre en la app | Autor | Fuente (URL) | Licencia |
 |---|---|---|---|---|
-| _pendiente_ | Lluvia | | | |
-| _pendiente_ | Olas | | | |
-| _pendiente_ | Bosque | | | |
-| _pendiente_ | Chimenea | | | |
+| _pendiente_ | Lluvia suave | | | |
+| _pendiente_ | Ruido blanco | | | |
+| _pendiente_ | Olas del mar | | | |
+| _pendiente_ | Bosque de noche | | | |
+
+> Las pistas deben estar pensadas para repetirse en bucle sin cortes.
+
+## Fuente tipográfica
+
+| Fuente | Autor | Licencia |
+|---|---|---|
+| Nunito (pendiente de agregar) | Vernon Adams y colaboradores | SIL Open Font License 1.1 |
 
 ## Librerías
 
-Las librerías de código (AndroidX, Hilt, Vico, etc.) están en
-`gradle/libs.versions.toml`; la mayoría usa licencia Apache 2.0.
+Las librerías de código están en `gradle/libs.versions.toml`; la mayoría usa
+licencia Apache 2.0.
