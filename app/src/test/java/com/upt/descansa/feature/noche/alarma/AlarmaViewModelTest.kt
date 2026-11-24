@@ -1,6 +1,8 @@
 package com.upt.descansa.feature.noche.alarma
 
 import app.cash.turbine.test
+import com.upt.descansa.domain.alarma.AlarmaProgramada
+import com.upt.descansa.domain.alarma.AlarmaRespaldo
 import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.FuenteDatos
 import com.upt.descansa.domain.repository.AjustesRepository
@@ -10,13 +12,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
- * Repositorio FALSO en memoria. Para un repositorio tan simple es más claro que
- * un mock: guarda de verdad y se puede revisar el resultado.
+ * Repositorio FALSO en memoria. Para algo tan simple es más claro que un mock:
+ * guarda de verdad y se puede revisar el resultado.
  */
 class AjustesRepositoryFalso(inicial: AjustesUsuario = AjustesUsuario()) : AjustesRepository {
     private val estado = MutableStateFlow(inicial)
@@ -26,18 +31,38 @@ class AjustesRepositoryFalso(inicial: AjustesUsuario = AjustesUsuario()) : Ajust
     }
 }
 
+/** Alarma FALSA: recuerda lo que se programó, sin tocar AlarmManager. */
+class AlarmaRespaldoFalsa(var exactasPermitidas: Boolean = true) : AlarmaRespaldo {
+    private val estado = MutableStateFlow<AlarmaProgramada?>(null)
+    override val programada: StateFlow<AlarmaProgramada?> = estado
+    override fun programar(alarma: AlarmaProgramada) {
+        estado.value = alarma
+    }
+    override fun cancelar() {
+        estado.value = null
+    }
+    override fun puedeProgramarExactas() = exactasPermitidas
+}
+
 class AlarmaViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val mexico = ZoneId.of("America/Mexico_City")
+
+    /** 23:30 del 24 de noviembre de 2026, hora de México. */
+    private val ahora = ZonedDateTime.of(2026, 11, 24, 23, 30, 0, 0, mexico).toInstant().toEpochMilli()
+
     private lateinit var repositorio: AjustesRepositoryFalso
+    private lateinit var alarma: AlarmaRespaldoFalsa
     private lateinit var viewModel: AlarmaViewModel
 
     @Before
     fun preparar() {
         repositorio = AjustesRepositoryFalso()
-        viewModel = AlarmaViewModel(ObservarAjustesUseCase(repositorio), repositorio)
+        alarma = AlarmaRespaldoFalsa()
+        viewModel = AlarmaViewModel(ObservarAjustesUseCase(repositorio), repositorio, alarma, { ahora }, { mexico })
     }
 
     @Test
@@ -61,14 +86,27 @@ class AlarmaViewModelTest {
     }
 
     @Test
-    fun `cambiar la hora limite se guarda en los ajustes`() = runTest {
-        viewModel.alCambiarHoraLimite(6 * 60 + 15)
-        assertEquals(6 * 60 + 15, repositorio.ajustes.value.horaLimiteMinutos)
-    }
-
-    @Test
     fun `apagar no molestar se guarda`() = runTest {
         viewModel.alCambiarNoMolestar(false)
         assertEquals(false, repositorio.ajustes.value.noMolestarActivado)
+    }
+
+    @Test
+    fun `activar programa la alarma de respaldo para manana a la hora limite`() = runTest {
+        repositorio.actualizar { it.copy(horaLimiteMinutos = 6 * 60 + 45, posponerMinutos = 10) }
+
+        val resultado = viewModel.activarModoNoche()
+
+        val esperado = ZonedDateTime.of(2026, 11, 25, 6, 45, 0, 0, mexico).toInstant().toEpochMilli()
+        assertEquals(ResultadoActivacion.Programada(esperado), resultado)
+        assertEquals(AlarmaProgramada(esperado, 6 * 60 + 45, 10), alarma.programada.value)
+    }
+
+    @Test
+    fun `sin permiso de alarmas exactas no se activa`() = runTest {
+        alarma.exactasPermitidas = false
+
+        assertEquals(ResultadoActivacion.SinPermisoExactas, viewModel.activarModoNoche())
+        assertNull(alarma.programada.value)
     }
 }

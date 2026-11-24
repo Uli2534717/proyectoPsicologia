@@ -2,6 +2,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ===================== Permisos (cada uno con su porqué) ===================== -->
+
+    <!-- Alarmas exactas. Android 13+: USE_EXACT_ALARM, que es para apps de
+         despertador; se concede solo y el usuario no lo puede revocar.
+         Android 12 (API 31-32) no tiene USE_EXACT_ALARM: ahí se usa
+         SCHEDULE_EXACT_ALARM, que en esas versiones viene concedido. -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
+    <!-- Notificación de la alarma (Android 13+ lo pide al usuario, en contexto). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Mostrar la pantalla de timbre sobre la pantalla de bloqueo. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <!-- Reprogramar la alarma después de reiniciar el teléfono. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Servicio en primer plano mientras suena la alarma (tipo systemExempted). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+
+    <!-- Vibración de la alarma y mantener la CPU despierta mientras suena. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <!--
         android:name: clase Application con @HiltAndroidApp (activa Hilt).
         android:allowBackup="false": por privacidad, los datos (noches,
@@ -21,6 +49,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Descansa"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -29,6 +58,52 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- ================= Alarma de respaldo (Fase 1, sección 6.2) =================
+             directBootAware="true": estos componentes funcionan aunque el teléfono
+             se haya reiniciado y aún nadie lo desbloquee (PIN o huella). -->
+
+        <!-- Pantalla de timbre: encima de la pantalla de bloqueo y enciende la pantalla.
+             taskAffinity vacío: no se mezcla con la pila de pantallas de la app. -->
+        <activity
+            android:name=".sistema.alarma.TimbreActivity"
+            android:directBootAware="true"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Descansa"
+            android:turnScreenOn="true" />
+
+        <!-- Hace sonar la alarma. -->
+        <service
+            android:name=".sistema.alarma.TimbreService"
+            android:directBootAware="true"
+            android:exported="false"
+            android:foregroundServiceType="systemExempted" />
+
+        <!-- Recibe el aviso de AlarmManager (solo la propia app lo puede enviar). -->
+        <receiver
+            android:name=".sistema.alarma.AlarmaReceiver"
+            android:directBootAware="true"
+            android:exported="false" />
+
+        <!-- Reprograma tras reinicio, actualización de la app o cambio de hora/zona.
+             exported="true" para que el sistema lo pueda avisar; son broadcasts
+             protegidos que ninguna otra app puede enviar. -->
+        <receiver
+            android:name=".sistema.alarma.ReinicioReceiver"
+            android:directBootAware="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
