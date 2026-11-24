@@ -32,7 +32,7 @@ servidores, sin anuncios. Ver [docs/PRIVACIDAD.md](docs/PRIVACIDAD.md).
 |---|---|---|
 | 0 | Base, tema, navegación por las 11 pantallas, base de datos | ✅ |
 | 1 | Alarma de respaldo | ✅ |
-| 2 | Servicio nocturno y motor de decisión | ⏳ |
+| 2 | Servicio nocturno y motor de decisión | ✅ |
 | 3 | No molestar | ⏳ |
 | 4 | Pendientes, respiración y relajación | ⏳ |
 | 5 | Sonidos | ⏳ |

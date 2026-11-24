@@ -157,8 +157,62 @@ Revisado contra la documentación oficial de Android el 23 de noviembre de 2026
   entrega `BOOT_COMPLETED`; la alarma se reprograma al desbloquear.
 - El botón "Probar alarma en 10 segundos" (modo desarrollador) reemplaza la
   alarma que esté programada.
-- Si se abre la app durante la noche, empieza en Inicio y no en el modo noche.
-  Se resolverá en la Fase 2, cuando exista el servicio nocturno.
+- ~~Si se abre la app durante la noche, empieza en Inicio y no en el modo noche.~~
+  Resuelto en la Fase 2: abre directo en el modo noche.
+
+## D-12 · Servicio nocturno y motor de decisión (Fase 2)
+
+El documento de requisitos (tabla de la sección 6.5) no está en el repositorio,
+así que los umbrales de abajo se decidieron con criterio. Si el equipo tiene esa
+tabla, basta con cambiar `Sensibilidad.parametros()` en `motor/MotorDecision.kt`
+y las constantes del mismo archivo; las pruebas indican qué se rompe.
+
+**Qué:**
+
+| Pieza | Elección |
+|---|---|
+| Servicio | `ServicioNocturno`, en primer plano, tipo `health` (+ `HIGH_SAMPLING_RATE_SENSORS`) |
+| Sensor | acelerómetro a `SENSOR_DELAY_NORMAL` (~5 Hz) con wake lock parcial hasta la hora límite + 30 min |
+| Época | 1 minuto; actividad = desviación estándar de \|a\|/g (`AgregadorEpocas`) |
+| Línea base | mediana de la actividad de la noche (sin épocas TOMADO), mínimo 0.002 g; con menos de 10 épocas se usa ese piso |
+| TOMADO | actividad ≥ 0.1 g (alguien levantó el teléfono) |
+| Alarma inteligente | `ProgramadorAlarma.dispararAhora()` con OTRO PendingIntent: la de respaldo sigue programada |
+| Versión del motor | 1 (se guarda en `noches.version_motor`) |
+
+**Sensibilidad:**
+
+| Sensibilidad | INQUIETA si actividad > base × | Despierta con |
+|---|---|---|
+| Baja | 3.0 | 3 de las últimas 3 épocas de la ventana |
+| Media (por defecto) | 2.0 | 2 de las últimas 3 |
+| Alta | 1.5 | 1 de las últimas 2 |
+
+Además, si el teléfono es TOMADO dentro de la ventana, suena (la persona ya está despierta).
+Fuera de la ventana el motor nunca despierta; para eso está la alarma de respaldo.
+
+**Por qué:**
+- `health` es el tipo de la documentación para servicios largos de bienestar.
+  Su requisito se cumple declarando `HIGH_SAMPLING_RATE_SENSORS`, un permiso
+  normal (sin diálogo). Pedir `ACTIVITY_RECOGNITION` agregaría un diálogo más.
+- La línea base usa la **mediana** para que unas pocas vueltas grandes no la
+  suban, y es **por noche** para adaptarse a cada persona y colchón.
+- El motor es Kotlin puro y compara marcas de tiempo, no minutos: así el
+  **simulador** (1 época por segundo) prueba exactamente el mismo código.
+- La alarma inteligente no reemplaza a la de respaldo: si fallara, la de la hora límite sigue en pie.
+
+**Simulador (modo desarrollador):** Ajustes → "Simular noche inquieta/tranquila".
+Noche de 60 "minutos" que dura 60 s, con ventana de 20. La inquieta debe sonar
+dentro de la ventana con motivo `SUENO_LIGERO`; la tranquila, a la hora límite
+con `HORA_LIMITE`. Probado en el emulador (API 37), junto con 2 minutos reales
+de acelerómetro con la pantalla apagada.
+
+**Limitaciones conocidas:**
+- Con sensibilidad Alta, la noche tranquila simulada puede sonar antes: una sola
+  vuelta dentro de la ventana basta. Es lo esperado para esa sensibilidad.
+- Leer el sensor toda la noche con wake lock gasta batería; se medirá en la Fase 7.
+- La fuente "Smartwatch" todavía usa el acelerómetro del teléfono (Fase 8).
+- Si se abre la app mientras suena la alarma, se muestra la pantalla de timbre
+  (así se puede apagar aunque se hayan negado las notificaciones).
 
 ---
 
@@ -166,8 +220,5 @@ Revisado contra la documentación oficial de Android el 23 de noviembre de 2026
 
 Se confirmarán con la documentación oficial vigente antes de implementarlas:
 
-- **Fase 2:** tipo de servicio en primer plano para el sensor (`health` o
-  `specialUse`) y sus permisos. Medida de actividad: desviación estándar de
-  |a|/g por minuto.
 - **Fase 3:** comportamiento de los "Modos" de Android 15+ frente a
   `setInterruptionFilter`.

@@ -64,6 +64,7 @@ import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
 import com.upt.descansa.domain.usecase.noche.DetenerModoNocheUseCase
 import com.upt.descansa.sistema.alarma.alarmaConTodosLosPermisos
 import com.upt.descansa.sistema.alarma.intentAjustesAlarma
+import com.upt.descansa.sistema.noche.EstadoNocturno
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -113,8 +114,10 @@ fun ModoNocheScreen(
         faltanPermisos = !alarmaConTodosLosPermisos(contexto)
         onPauseOrDispose { }
     }
+    val minutosMedidos by EstadoNocturno.epocasRegistradas.collectAsStateWithLifecycle()
     ModoNocheContenido(
         ajustes = ajustes,
+        minutosMedidos = minutosMedidos,
         faltanPermisos = faltanPermisos,
         onAbrirPermisos = { contexto.startActivity(intentAjustesAlarma(contexto)) },
         onDetener = { viewModel.alDetener(onDetenido) },
@@ -125,6 +128,7 @@ fun ModoNocheScreen(
 fun ModoNocheContenido(
     ajustes: AjustesUsuario,
     onDetener: () -> Unit,
+    minutosMedidos: Int = 0,
     faltanPermisos: Boolean = false,
     onAbrirPermisos: () -> Unit = {},
 ) {
@@ -174,6 +178,7 @@ fun ModoNocheContenido(
                 if (ajustes.fuente == FuenteDatos.SMARTWATCH) R.string.alarma_fuente_reloj else R.string.alarma_fuente_telefono,
             )
             LineaActivada(stringResource(R.string.modo_noche_fuente, fuente.lowercase()))
+            LineaActivada(stringResource(R.string.modo_noche_midiendo, minutosMedidos))
         }
         if (faltanPermisos) {
             // Honestidad: si la alarma no se verá o puede retrasarse, se dice y se ofrece arreglarlo.

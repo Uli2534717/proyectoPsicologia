@@ -66,6 +66,40 @@ data class AjustesUsuario(
     val modoDesarrollador: Boolean = false,
 )
 
+/**
+ * Un minuto (época) de la noche ya clasificado por el motor.
+ * @property minutoTs inicio de la época (epoch ms, UTC).
+ * @property actividad desviación estándar de |a|/g en la época (ver DECISIONES.md, D-12).
+ */
+data class Epoca(
+    val minutoTs: Long,
+    val actividad: Double,
+    val marca: MarcaEpoca,
+)
+
+/** Lo que el servicio nocturno necesita saber de la noche en curso. */
+data class NocheActiva(
+    val id: Long,
+    val iniciadaEn: Long,
+    val horaLimiteEn: Long,
+    val ventanaMinutos: Int,
+)
+
+/** Cuándo y por qué sonó la alarma (se guarda antes de que el usuario la apague). */
+data class Disparo(
+    val motivo: MotivoDisparo,
+    val en: Long,
+)
+
+/** Tipos de noche del simulador (modo desarrollador). */
+enum class TipoSimulacion {
+    /** Poco movimiento toda la noche: debe sonar la alarma de respaldo. */
+    TRANQUILA,
+
+    /** Movimiento dentro de la ventana: debe sonar antes, por sueño ligero. */
+    INQUIETA,
+}
+
 /** Datos de la tarjeta "Tu última noche" en Inicio. Horas en formato local "HH:mm". */
 data class ResumenUltimaNoche(
     val minutosDormidos: Int,

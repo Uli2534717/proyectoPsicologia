@@ -57,10 +57,26 @@ tras reiniciar la alarma de las 07:00 se vuelve a programar.
 > app**: así funciona Android y ninguna app lo puede evitar. Por eso no se
 > incluye como prueba.
 
+## Fase 2 · Servicio nocturno y motor
+
+Simulador: en Ajustes, con **Modo desarrollador** activado, toca **Simular noche
+inquieta** o **Simular noche tranquila** y bloquea el teléfono. Cada una dura 1 minuto.
+
+En el emulador (API 37) ya se comprobó: la inquieta suena a los ~41 s (dentro de
+la ventana) con motivo `SUENO_LIGERO`, y la tranquila a los 60 s con `HORA_LIMITE`.
+Con el acelerómetro real se guardó una época por minuto con la pantalla apagada.
+
+- [ ] Noche inquieta simulada: suena antes del minuto.
+- [ ] Noche tranquila simulada: suena justo al minuto.
+- [ ] Al activar el modo noche aparece la notificación discreta "Modo noche activo".
+- [ ] El modo noche muestra "Midiendo movimiento: N min" y el número sube cada minuto.
+- [ ] Cerrar la app y volver a abrirla durante la noche: abre directo en el modo noche.
+- [ ] Con la alarma sonando y las notificaciones negadas, abrir la app muestra la pantalla de timbre.
+- [ ] **Noche real:** teléfono sobre el colchón; anotar a qué hora sonó y si fue antes de la hora límite: ______
+- [ ] Probar las 3 sensibilidades en noches distintas; anotar la que se sintió mejor: ______
+
 ## Fases siguientes (se completan en su fase)
 
-- [ ] Alarma inteligente con el simulador (noche inquieta y noche tranquila).
-- [ ] Una noche real de prueba.
 - [ ] No molestar se activa y se restaura al detener.
 - [ ] Sonido toda la noche con la pantalla apagada y apagado gradual.
 - [ ] Consumo de batería en 8 horas de sesión: ____ %.

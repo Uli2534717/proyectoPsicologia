@@ -38,7 +38,24 @@ class AlarmSchedulerImpl @Inject constructor(
     override fun programar(disparoEn: Long) {
         // commit = true: se escribe en disco ya, por si el teléfono se reinicia enseguida.
         prefs.edit(commit = true) { putLong(CLAVE_PROGRAMADA_EN, disparoEn) }
-        val operacion = intentDisparo()
+        poner(disparoEn, intentDisparo(CODIGO_DISPARO))
+    }
+
+    /**
+     * La alarma inteligente usa OTRO PendingIntent (otro código): así no reemplaza
+     * a la de respaldo, que sigue programada por si esta fallara.
+     */
+    override fun dispararAhora() {
+        poner(System.currentTimeMillis() + 1_000L, intentDisparo(CODIGO_INTELIGENTE))
+    }
+
+    override fun cancelar() {
+        alarmManager.cancel(intentDisparo(CODIGO_DISPARO))
+        alarmManager.cancel(intentDisparo(CODIGO_INTELIGENTE))
+        prefs.edit(commit = true) { remove(CLAVE_PROGRAMADA_EN) }
+    }
+
+    private fun poner(disparoEn: Long, operacion: PendingIntent) {
         try {
             if (puedeProgramarExactas(context)) {
                 // El segundo PendingIntent es lo que se abre al tocar el ícono de alarma del sistema.
@@ -51,11 +68,6 @@ class AlarmSchedulerImpl @Inject constructor(
         // Plan B sin permiso de alarmas exactas: puede retrasarse unos minutos, pero suena.
         // La pantalla de modo noche avisa de esto al usuario.
         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, disparoEn, operacion)
-    }
-
-    override fun cancelar() {
-        alarmManager.cancel(intentDisparo())
-        prefs.edit(commit = true) { remove(CLAVE_PROGRAMADA_EN) }
     }
 
     /**
@@ -72,9 +84,9 @@ class AlarmSchedulerImpl @Inject constructor(
         }
     }
 
-    private fun intentDisparo(): PendingIntent = PendingIntent.getBroadcast(
+    private fun intentDisparo(codigo: Int): PendingIntent = PendingIntent.getBroadcast(
         context,
-        CODIGO_DISPARO,
+        codigo,
         Intent(context, AlarmaReceiver::class.java),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
@@ -91,6 +103,7 @@ class AlarmSchedulerImpl @Inject constructor(
         const val CLAVE_PROGRAMADA_EN = "programada_en"
         const val CODIGO_DISPARO = 100
         const val CODIGO_MOSTRAR = 101
+        const val CODIGO_INTELIGENTE = 102
 
         /** Si el teléfono estuvo apagado a la hora de la alarma, suena al encender solo si pasó menos de 1 h. */
         const val TOLERANCIA_ATRASO_MS = 60 * 60 * 1000L

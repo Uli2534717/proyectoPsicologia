@@ -2,7 +2,9 @@ package com.upt.descansa.domain.usecase.noche
 
 import com.upt.descansa.core.util.proximaOcurrencia
 import com.upt.descansa.domain.model.MotivoDisparo
+import com.upt.descansa.domain.model.TipoSimulacion
 import com.upt.descansa.domain.repository.AjustesRepository
+import com.upt.descansa.domain.repository.ControlServicioNocturno
 import com.upt.descansa.domain.repository.NocheRepository
 import com.upt.descansa.domain.repository.ProgramadorAlarma
 import kotlinx.coroutines.flow.first
@@ -10,30 +12,56 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 
 // =============================================================================
-//  Casos de uso de la noche (Fase 1: alarma de respaldo).
+//  Casos de uso de la noche (Fases 1 y 2).
 //  Reciben la hora "ahora" como parámetro para que las pruebas no dependan
 //  del reloj real de la computadora.
 // =============================================================================
 
 /**
- * "Activar modo noche": programa la alarma de respaldo a la hora límite y abre
- * la noche en la base de datos.
+ * "Activar modo noche": programa la alarma de respaldo a la hora límite, abre
+ * la noche en la base de datos y arranca el servicio que mide el movimiento.
  *
- * @return la hora a la que sonará la alarma (epoch ms).
+ * @return la hora a la que sonará la alarma de respaldo (epoch ms).
  */
 class ActivarModoNocheUseCase @Inject constructor(
     private val ajustesRepositorio: AjustesRepository,
     private val nocheRepositorio: NocheRepository,
     private val programador: ProgramadorAlarma,
+    private val servicio: ControlServicioNocturno,
 ) {
     suspend operator fun invoke(ahora: ZonedDateTime = ZonedDateTime.now()): Long {
         val ajustes = ajustesRepositorio.ajustes.first()
         val horaLimiteEn = proximaOcurrencia(ahora, ajustes.horaLimiteMinutos).toInstant().toEpochMilli()
-        // Primero la alarma: si después fallara la base de datos, la alarma ya está
-        // puesta (principio "la alarma nunca falla").
+        // Primero la alarma: si después fallara la base de datos o el servicio, la
+        // alarma ya está puesta (principio "la alarma nunca falla").
         programador.programar(horaLimiteEn)
         nocheRepositorio.iniciar(ahora.toInstant().toEpochMilli(), horaLimiteEn, ajustes)
+        servicio.iniciar()
         return horaLimiteEn
+    }
+}
+
+/**
+ * Modo desarrollador: una noche de 60 "minutos" que dura 60 segundos, con
+ * ventana de 20. Prueba el motor y las dos alarmas en un minuto (D-12).
+ */
+class IniciarSimulacionUseCase @Inject constructor(
+    private val ajustesRepositorio: AjustesRepository,
+    private val nocheRepositorio: NocheRepository,
+    private val programador: ProgramadorAlarma,
+    private val servicio: ControlServicioNocturno,
+) {
+    suspend operator fun invoke(tipo: TipoSimulacion, ahora: Long = System.currentTimeMillis()) {
+        val ajustes = ajustesRepositorio.ajustes.first().copy(ventanaMinutos = VENTANA_SIMULADA)
+        val horaLimiteEn = ahora + DURACION_SIMULADA_MS
+        programador.programar(horaLimiteEn)
+        nocheRepositorio.iniciar(ahora, horaLimiteEn, ajustes)
+        servicio.iniciar(tipo)
+    }
+
+    companion object {
+        const val DURACION_SIMULADA_MS = 60_000L
+        const val VENTANA_SIMULADA = 20
     }
 }
 
@@ -41,8 +69,10 @@ class ActivarModoNocheUseCase @Inject constructor(
 class DetenerModoNocheUseCase @Inject constructor(
     private val nocheRepositorio: NocheRepository,
     private val programador: ProgramadorAlarma,
+    private val servicio: ControlServicioNocturno,
 ) {
     suspend operator fun invoke(ahora: Long = System.currentTimeMillis()) {
+        servicio.detener()
         programador.cancelar()
         nocheRepositorio.terminarActiva(ahora, MotivoDisparo.DETENIDA_MANUALMENTE, disparadaEn = null)
     }
@@ -50,18 +80,25 @@ class DetenerModoNocheUseCase @Inject constructor(
 
 /**
  * "Apagar" en la pantalla de timbre: la noche termina.
- * En la Fase 1 la alarma solo suena a la hora límite, por eso el motivo es
- * siempre [MotivoDisparo.HORA_LIMITE]. La Fase 2 agregará [MotivoDisparo.SUENO_LIGERO].
+ * Si el motor ya había anotado que sonó por sueño ligero, se conserva ese motivo;
+ * si no, sonó la alarma de respaldo ([MotivoDisparo.HORA_LIMITE]).
  *
  * @param disparadaEn cuándo empezó a sonar (no cuándo se apagó).
  */
 class ApagarAlarmaUseCase @Inject constructor(
     private val nocheRepositorio: NocheRepository,
     private val programador: ProgramadorAlarma,
+    private val servicio: ControlServicioNocturno,
 ) {
     suspend operator fun invoke(disparadaEn: Long, ahora: Long = System.currentTimeMillis()) {
+        servicio.detener()
         programador.cancelar()
-        nocheRepositorio.terminarActiva(ahora, MotivoDisparo.HORA_LIMITE, disparadaEn)
+        val disparo = nocheRepositorio.disparoRegistrado()
+        nocheRepositorio.terminarActiva(
+            terminadaEn = ahora,
+            motivo = disparo?.motivo ?: MotivoDisparo.HORA_LIMITE,
+            disparadaEn = disparo?.en ?: disparadaEn,
+        )
     }
 }
 

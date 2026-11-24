@@ -25,6 +25,17 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- ===== Servicio nocturno (Fase 2). Ver docs/DECISIONES.md, D-12. ===== -->
+    <!--
+        Tipo "health": servicio largo para apps de bienestar. Android exige,
+        además, HIGH_SAMPLING_RATE_SENSORS (permiso normal, sin diálogo) o un
+        permiso de sensores corporales. Leemos el acelerómetro a ~5 Hz, no más.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission
+        android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"
+        tools:ignore="HighSamplingRate" />
+
     <!--
         android:name: clase Application con @HiltAndroidApp (activa Hilt).
         android:allowBackup="false": por privacidad, los datos (noches,
@@ -67,6 +78,11 @@
             android:taskAffinity=""
             android:theme="@style/Theme.Descansa"
             android:turnScreenOn="true" />
+
+        <service
+            android:name=".sistema.noche.ServicioNocturno"
+            android:exported="false"
+            android:foregroundServiceType="health" />
 
         <service
             android:name=".sistema.alarma.TimbreService"

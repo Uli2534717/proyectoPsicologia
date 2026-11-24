@@ -42,6 +42,8 @@ import com.upt.descansa.core.theme.TextoAtenuado
 import com.upt.descansa.core.theme.Turquesa
 import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.Sensibilidad
+import com.upt.descansa.domain.model.TipoSimulacion
+import com.upt.descansa.domain.usecase.noche.IniciarSimulacionUseCase
 import com.upt.descansa.domain.repository.AjustesRepository
 import com.upt.descansa.domain.repository.ProgramadorAlarma
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
@@ -57,7 +59,16 @@ class AjustesViewModel @Inject constructor(
     observarAjustes: ObservarAjustesUseCase,
     private val repositorio: AjustesRepository,
     private val programador: ProgramadorAlarma,
+    private val iniciarSimulacion: IniciarSimulacionUseCase,
 ) : ViewModel() {
+
+    /** Modo desarrollador: arranca una noche simulada de 1 minuto y luego llama a [onListo]. */
+    fun alSimular(tipo: TipoSimulacion, onListo: () -> Unit) {
+        viewModelScope.launch {
+            iniciarSimulacion(tipo)
+            onListo()
+        }
+    }
 
     val ajustes: StateFlow<AjustesUsuario> =
         observarAjustes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AjustesUsuario())
@@ -87,6 +98,7 @@ private val opcionesPosponer = listOf(5, 10, 15)
 @Composable
 fun AjustesScreen(
     onAtras: () -> Unit,
+    onSimulacionIniciada: () -> Unit = {},
     viewModel: AjustesViewModel = hiltViewModel(),
 ) {
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
@@ -95,6 +107,7 @@ fun AjustesScreen(
         onAtras = onAtras,
         onCambiar = viewModel::alCambiar,
         onProbarAlarma = viewModel::alProbarAlarma,
+        onSimular = { tipo -> viewModel.alSimular(tipo, onSimulacionIniciada) },
     )
 }
 
@@ -104,6 +117,7 @@ fun AjustesContenido(
     onAtras: () -> Unit,
     onCambiar: ((AjustesUsuario) -> AjustesUsuario) -> Unit,
     onProbarAlarma: () -> Unit = {},
+    onSimular: (TipoSimulacion) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -165,6 +179,10 @@ fun AjustesContenido(
         if (ajustes.modoDesarrollador) {
             BotonSecundario(texto = stringResource(R.string.ajustes_probar_alarma), onClick = onProbarAlarma)
             Text(stringResource(R.string.ajustes_probar_alarma_detalle), style = MaterialTheme.typography.bodySmall, color = TextoAtenuado)
+            // Simulador del motor (Fase 2): el emulador no tiene un acelerómetro que se mueva.
+            BotonSecundario(texto = stringResource(R.string.ajustes_simular_inquieta), onClick = { onSimular(TipoSimulacion.INQUIETA) })
+            BotonSecundario(texto = stringResource(R.string.ajustes_simular_tranquila), onClick = { onSimular(TipoSimulacion.TRANQUILA) })
+            Text(stringResource(R.string.ajustes_simular_detalle), style = MaterialTheme.typography.bodySmall, color = TextoAtenuado)
         }
         // Aviso permanente (sección 14).
         Text(stringResource(R.string.aviso_no_medico), style = MaterialTheme.typography.bodySmall, color = TextoAtenuado)

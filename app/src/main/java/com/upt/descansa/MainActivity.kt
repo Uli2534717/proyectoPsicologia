@@ -11,10 +11,16 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.upt.descansa.core.navigation.DescansaNavegacion
 import com.upt.descansa.core.theme.DescansaTheme
+import com.upt.descansa.sistema.alarma.EstadoTimbre
+import com.upt.descansa.sistema.alarma.TimbreActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 /**
  * Activity principal: todas las pantallas son composables que Navigation
@@ -37,6 +43,16 @@ class MainActivity : ComponentActivity() {
         val barras = SystemBarStyle.dark(Color.TRANSPARENT)
         enableEdgeToEdge(statusBarStyle = barras, navigationBarStyle = barras)
 
+        // Si la alarma está sonando y se abre la app, se muestra la pantalla de timbre.
+        // Sin esto, quien negó las notificaciones no tendría dónde apagarla.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                EstadoTimbre.sonando.collect { sonando ->
+                    if (sonando) startActivity(Intent(this@MainActivity, TimbreActivity::class.java))
+                }
+            }
+        }
+
         setContent {
             DescansaTheme {
                 val arranque by viewModel.arranque.collectAsStateWithLifecycle()
@@ -46,6 +62,7 @@ class MainActivity : ComponentActivity() {
                     bienvenidaCompletada = listo.bienvenidaCompletada,
                     abrirManana = abrirManana,
                     onMananaAbierta = { abrirManana = false },
+                    nocheEnCurso = listo.nocheEnCurso,
                 )
             }
         }

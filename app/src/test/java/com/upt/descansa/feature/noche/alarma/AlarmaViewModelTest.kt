@@ -6,6 +6,7 @@ import com.upt.descansa.domain.model.FuenteDatos
 import com.upt.descansa.domain.repository.AjustesRepository
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
 import com.upt.descansa.domain.usecase.noche.ActivarModoNocheUseCase
+import com.upt.descansa.testutil.ControlServicioNocturnoFalso
 import com.upt.descansa.testutil.MainDispatcherRule
 import com.upt.descansa.testutil.NocheRepositoryFalso
 import com.upt.descansa.testutil.ProgramadorAlarmaFalso
@@ -44,7 +45,7 @@ class AlarmaViewModelTest {
     fun preparar() {
         repositorio = AjustesRepositoryFalso()
         programador = ProgramadorAlarmaFalso()
-        val activar = ActivarModoNocheUseCase(repositorio, NocheRepositoryFalso(), programador)
+        val activar = ActivarModoNocheUseCase(repositorio, NocheRepositoryFalso(), programador, ControlServicioNocturnoFalso())
         viewModel = AlarmaViewModel(ObservarAjustesUseCase(repositorio), repositorio, activar)
     }
 

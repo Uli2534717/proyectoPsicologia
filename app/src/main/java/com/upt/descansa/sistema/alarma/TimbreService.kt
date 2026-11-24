@@ -23,6 +23,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.upt.descansa.R
 import com.upt.descansa.core.util.formatearHora
+import com.upt.descansa.domain.repository.ControlServicioNocturno
 import com.upt.descansa.domain.usecase.noche.ApagarAlarmaUseCase
 import com.upt.descansa.domain.usecase.noche.PosponerAlarmaUseCase
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,6 +67,7 @@ class TimbreService : Service() {
 
     @Inject lateinit var apagarAlarma: ApagarAlarmaUseCase
     @Inject lateinit var posponerAlarma: PosponerAlarmaUseCase
+    @Inject lateinit var servicioNocturno: ControlServicioNocturno
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var reproductor: MediaPlayer? = null
@@ -100,6 +102,8 @@ class TimbreService : Service() {
         iniciarEnPrimerPlano()
         if (yaSonaba) return
 
+        // Ya está sonando (por sueño ligero o por la hora límite): no hace falta seguir midiendo.
+        servicioNocturno.detener()
         sonandoDesde = System.currentTimeMillis()
         // Mantiene la CPU despierta mientras suena (se libera sola a los 10 min).
         wakeLock = getSystemService(PowerManager::class.java)

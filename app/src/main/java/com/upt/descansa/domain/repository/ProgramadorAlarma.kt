@@ -1,7 +1,7 @@
 package com.upt.descansa.domain.repository
 
 /**
- * Contrato para programar la alarma de respaldo en el sistema.
+ * Contrato para programar la alarma en el sistema.
  *
  * Vive en `domain` (sin Android) para que los casos de uso se puedan probar con
  * un programador falso. La implementación real usa `AlarmManager.setAlarmClock()`
@@ -9,9 +9,15 @@ package com.upt.descansa.domain.repository
  */
 interface ProgramadorAlarma {
 
-    /** Programa (o reemplaza) la alarma para que suene en [disparoEn] (epoch ms, UTC). */
+    /** Programa (o reemplaza) la alarma de respaldo para [disparoEn] (epoch ms, UTC). */
     fun programar(disparoEn: Long)
 
-    /** Cancela la alarma programada, si hay una. */
+    /**
+     * Hace sonar la alarma ya (la decidió el motor por sueño ligero).
+     * NO toca la alarma de respaldo: si esta fallara, la de la hora límite sigue en pie.
+     */
+    fun dispararAhora()
+
+    /** Cancela la alarma de respaldo y la inteligente, si hay. */
     fun cancelar()
 }
