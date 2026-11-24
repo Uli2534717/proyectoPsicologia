@@ -19,6 +19,15 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.upt.descansa.core.util.formatearHora
+import com.upt.descansa.domain.alarma.AlarmaProgramada
+import com.upt.descansa.domain.alarma.AlarmaRespaldo
+import com.upt.descansa.domain.alarma.CalculoAlarma
+import java.time.Instant
+import java.time.ZoneId
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -54,6 +63,7 @@ import javax.inject.Inject
 class AjustesViewModel @Inject constructor(
     observarAjustes: ObservarAjustesUseCase,
     private val repositorio: AjustesRepository,
+    private val alarmaRespaldo: AlarmaRespaldo,
 ) : ViewModel() {
 
     val ajustes: StateFlow<AjustesUsuario> =
@@ -61,6 +71,26 @@ class AjustesViewModel @Inject constructor(
 
     fun alCambiar(cambio: (AjustesUsuario) -> AjustesUsuario) {
         viewModelScope.launch { repositorio.actualizar(cambio) }
+    }
+
+    /**
+     * Modo desarrollador: programa una alarma de respaldo REAL dentro de 2 minutos
+     * (criterio de la Fase 1: bloquear, reiniciar y comprobar que suena).
+     * Se marca como posposición para que conserve su hora exacta tras un reinicio.
+     * @return la hora local "HH:mm" a la que sonará.
+     */
+    fun probarAlarma(): String {
+        val disparo = CalculoAlarma.horaPosposicion(System.currentTimeMillis(), 2)
+        alarmaRespaldo.programar(
+            AlarmaProgramada(
+                disparoEnMs = disparo,
+                horaLimiteMinutos = ajustes.value.horaLimiteMinutos,
+                posponerMinutos = ajustes.value.posponerMinutos,
+                esPosposicion = true,
+            ),
+        )
+        val hora = Instant.ofEpochMilli(disparo).atZone(ZoneId.systemDefault()).toLocalTime()
+        return formatearHora(hora.hour * 60 + hora.minute)
     }
 }
 
@@ -79,7 +109,12 @@ fun AjustesScreen(
     viewModel: AjustesViewModel = hiltViewModel(),
 ) {
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
-    AjustesContenido(ajustes = ajustes, onAtras = onAtras, onCambiar = viewModel::alCambiar)
+    AjustesContenido(
+        ajustes = ajustes,
+        onAtras = onAtras,
+        onCambiar = viewModel::alCambiar,
+        onProbarAlarma = viewModel::probarAlarma,
+    )
 }
 
 @Composable
@@ -87,7 +122,9 @@ fun AjustesContenido(
     ajustes: AjustesUsuario,
     onAtras: () -> Unit,
     onCambiar: ((AjustesUsuario) -> AjustesUsuario) -> Unit,
+    onProbarAlarma: () -> String = { "" },
 ) {
+    var alarmaDePrueba by rememberSaveable { mutableStateOf<String?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -145,6 +182,17 @@ fun AjustesContenido(
             activado = ajustes.modoDesarrollador,
             onCambiar = { v -> onCambiar { it.copy(modoDesarrollador = v) } },
         )
+        if (ajustes.modoDesarrollador) {
+            TarjetaDescansa(Modifier.fillMaxWidth(), onClick = { alarmaDePrueba = onProbarAlarma() }) {
+                Text(stringResource(R.string.ajustes_probar_alarma), style = MaterialTheme.typography.titleMedium, color = Texto)
+                Text(
+                    alarmaDePrueba?.let { stringResource(R.string.ajustes_alarma_programada, it) }
+                        ?: stringResource(R.string.ajustes_probar_alarma_detalle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextoAtenuado,
+                )
+            }
+        }
         // Aviso permanente (sección 14).
         Text(stringResource(R.string.aviso_no_medico), style = MaterialTheme.typography.bodySmall, color = TextoAtenuado)
     }

@@ -1,5 +1,13 @@
 package com.upt.descansa.feature.noche.alarma
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.upt.descansa.core.theme.Advertencia
+import com.upt.descansa.sistema.Permisos
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -62,14 +70,89 @@ fun AlarmaScreen(
     viewModel: AlarmaViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val alcance = rememberCoroutineScope()
+    var dialogo by rememberSaveable { mutableStateOf(DialogoPermiso.NINGUNO) }
+    var errorExactas by rememberSaveable { mutableStateOf(false) }
+
+    // Paso final: programar la alarma y, si Android no deja la pantalla
+    // completa, ofrecer activarla (sin bloquear: la alarma suena igual).
+    val activar: () -> Unit = {
+        alcance.launch {
+            when (viewModel.activarModoNoche()) {
+                ResultadoActivacion.SinPermisoExactas -> errorExactas = true
+                is ResultadoActivacion.Programada -> {
+                    errorExactas = false
+                    if (Permisos.puedeUsarPantallaCompleta(context)) onActivarModoNoche() else dialogo = DialogoPermiso.PANTALLA_COMPLETA
+                }
+            }
+        }
+    }
+    // Se pide el permiso de notificaciones; con o sin él, se activa la noche.
+    val pedirNotificaciones = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { activar() }
+
     AlarmaContenido(
         estado = estado,
         onAtras = onAtras,
-        onActivarModoNoche = onActivarModoNoche,
+        onActivarModoNoche = {
+            if (Permisos.faltaNotificaciones(context)) dialogo = DialogoPermiso.NOTIFICACIONES else activar()
+        },
         onCambiarHora = viewModel::alCambiarHoraLimite,
         onCambiarVentana = viewModel::alCambiarVentana,
         onCambiarFuente = viewModel::alCambiarFuente,
         onCambiarNoMolestar = viewModel::alCambiarNoMolestar,
+        error = if (errorExactas) stringResource(R.string.alarma_error_exactas) else null,
+    )
+
+    when (dialogo) {
+        DialogoPermiso.NINGUNO -> Unit
+        // Explicación ANTES del diálogo del sistema (sección 14).
+        DialogoPermiso.NOTIFICACIONES -> DialogoExplicacion(
+            titulo = stringResource(R.string.permiso_notif_titulo),
+            texto = stringResource(R.string.permiso_notif_texto),
+            textoAceptar = stringResource(R.string.permiso_permitir),
+            onAceptar = {
+                dialogo = DialogoPermiso.NINGUNO
+                pedirNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+            },
+            onRechazar = {
+                dialogo = DialogoPermiso.NINGUNO
+                activar()
+            },
+        )
+        DialogoPermiso.PANTALLA_COMPLETA -> DialogoExplicacion(
+            titulo = stringResource(R.string.permiso_fsi_titulo),
+            texto = stringResource(R.string.permiso_fsi_texto),
+            textoAceptar = stringResource(R.string.permiso_abrir_ajustes),
+            onAceptar = {
+                dialogo = DialogoPermiso.NINGUNO
+                Permisos.abrirAjustePantallaCompleta(context)
+                onActivarModoNoche()
+            },
+            onRechazar = {
+                dialogo = DialogoPermiso.NINGUNO
+                onActivarModoNoche()
+            },
+        )
+    }
+}
+
+private enum class DialogoPermiso { NINGUNO, NOTIFICACIONES, PANTALLA_COMPLETA }
+
+@Composable
+private fun DialogoExplicacion(
+    titulo: String,
+    texto: String,
+    textoAceptar: String,
+    onAceptar: () -> Unit,
+    onRechazar: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onRechazar,
+        title = { Text(titulo) },
+        text = { Text(texto) },
+        confirmButton = { TextButton(onClick = onAceptar) { Text(textoAceptar) } },
+        dismissButton = { TextButton(onClick = onRechazar) { Text(stringResource(R.string.permiso_ahora_no)) } },
     )
 }
 
@@ -83,6 +166,7 @@ fun AlarmaContenido(
     onCambiarVentana: (Int) -> Unit,
     onCambiarFuente: (FuenteDatos) -> Unit,
     onCambiarNoMolestar: (Boolean) -> Unit,
+    error: String? = null,
 ) {
     var eligiendoHora by rememberSaveable { mutableStateOf(false) }
     val horaLimite = formatearHora(estado.horaLimiteMinutos)
@@ -136,6 +220,9 @@ fun AlarmaContenido(
 
         // Principio "la alarma nunca falla": siempre se avisa del respaldo.
         AvisoTarjeta(icono = Icons.Outlined.ErrorOutline, texto = stringResource(R.string.alarma_respaldo))
+        if (error != null) {
+            AvisoTarjeta(icono = Icons.Outlined.ErrorOutline, texto = error, colorIcono = Advertencia)
+        }
 
         TarjetaDescansa(
             modifier = Modifier

@@ -134,6 +134,27 @@
     <string name="modo_noche_confirmar_titulo">¿Detener el modo noche?</string>
     <string name="modo_noche_confirmar_texto">Se cancelará la alarma inteligente y la de respaldo.</string>
 
+    <!-- Activación del modo noche (permisos en contexto, sección 14) -->
+    <string name="permiso_notif_titulo">Para ver tu alarma</string>
+    <string name="permiso_notif_texto">Descansa necesita mostrar notificaciones para abrir la pantalla de la alarma sobre tu pantalla de bloqueo. Sin este permiso la alarma sonará igual, pero tendrás que abrir la app para apagarla.</string>
+    <string name="permiso_permitir">Permitir</string>
+    <string name="permiso_ahora_no">Ahora no</string>
+    <string name="permiso_fsi_titulo">Pantalla completa de la alarma</string>
+    <string name="permiso_fsi_texto">Android tiene desactivado que Descansa muestre la alarma en pantalla completa. La alarma sonará igual, pero aparecerá solo como notificación. ¿Quieres activarlo?</string>
+    <string name="permiso_abrir_ajustes">Abrir ajustes</string>
+    <string name="alarma_error_exactas">Android no permite que Descansa programe alarmas exactas. Actívalo en Ajustes de Android → Alarmas y recordatorios.</string>
+    <string name="modo_noche_sin_respaldo">No hay alarma de respaldo programada</string>
+    <string name="modo_noche_proxima_alarma">Próxima alarma: %1$s</string>
+
+    <!-- Timbre de la alarma -->
+    <string name="timbre_titulo">Hora de despertar</string>
+    <string name="timbre_subtitulo">Buenos días. Tómate un momento antes de levantarte.</string>
+    <string name="timbre_notificacion_texto">Toca para abrir la alarma.</string>
+    <string name="timbre_detener">Detener</string>
+    <string name="timbre_posponer">Posponer %1$d min</string>
+    <string name="canal_alarma">Alarma</string>
+    <string name="canal_alarma_descripcion">La alarma de despertar. Se muestra sobre la pantalla de bloqueo.</string>
+
     <!-- 9. Mañana -->
     <string name="manana_saludo">Buenos días</string>
     <string name="manana_subtitulo">Así fue tu noche.</string>
@@ -179,4 +200,7 @@
     <string name="ajustes_creditos">Créditos</string>
     <string name="ajustes_desarrollador">Modo desarrollador</string>
     <string name="ajustes_proximamente">Disponible en una próxima fase.</string>
+    <string name="ajustes_probar_alarma">Probar alarma en 2 minutos</string>
+    <string name="ajustes_probar_alarma_detalle">Programa una alarma de respaldo real para dentro de 2 minutos. Sirve para probarla con el teléfono bloqueado o reiniciado.</string>
+    <string name="ajustes_alarma_programada">Alarma programada para las %1$s.</string>
 </resources>

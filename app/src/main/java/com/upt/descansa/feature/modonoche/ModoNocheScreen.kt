@@ -16,6 +16,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bedtime
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.ErrorOutline
+import com.upt.descansa.core.theme.Advertencia
+import com.upt.descansa.domain.alarma.AlarmaProgramada
+import com.upt.descansa.domain.alarma.AlarmaRespaldo
+import java.time.Instant
+import java.time.ZoneId
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -65,11 +71,20 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.LocalTime
 import javax.inject.Inject
 
-/** Lee los ajustes con los que se activó la noche, para mostrarlos. */
+/** Lee los ajustes de la noche y la alarma de respaldo REAL que está programada. */
 @HiltViewModel
-class ModoNocheViewModel @Inject constructor(observarAjustes: ObservarAjustesUseCase) : ViewModel() {
+class ModoNocheViewModel @Inject constructor(
+    observarAjustes: ObservarAjustesUseCase,
+    private val alarmaRespaldo: AlarmaRespaldo,
+) : ViewModel() {
     val ajustes: StateFlow<AjustesUsuario> =
         observarAjustes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AjustesUsuario())
+
+    val alarma: StateFlow<AlarmaProgramada?> =
+        alarmaRespaldo.programada.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /** Detener la sesión cancela la alarma de respaldo. */
+    fun detener() = alarmaRespaldo.cancelar()
 }
 
 /**
@@ -86,11 +101,27 @@ fun ModoNocheScreen(
     viewModel: ModoNocheViewModel = hiltViewModel(),
 ) {
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
-    ModoNocheContenido(ajustes = ajustes, onDetener = onDetenido)
+    val alarma by viewModel.alarma.collectAsStateWithLifecycle()
+    ModoNocheContenido(
+        ajustes = ajustes,
+        respaldo = alarma?.let { formatearHora(minutosLocales(it.disparoEnMs)) },
+        onDetener = {
+            viewModel.detener()
+            onDetenido()
+        },
+    )
 }
 
+/** Hora local ("minutos desde 00:00") de un instante en epoch ms. */
+private fun minutosLocales(epochMs: Long): Int =
+    Instant.ofEpochMilli(epochMs).atZone(ZoneId.systemDefault()).toLocalTime().let { it.hour * 60 + it.minute }
+
+/**
+ * @param respaldo hora de la alarma de respaldo programada ("07:00"), o null si
+ *        no hay ninguna (se muestra una advertencia, nunca se finge).
+ */
 @Composable
-fun ModoNocheContenido(ajustes: AjustesUsuario, onDetener: () -> Unit) {
+fun ModoNocheContenido(ajustes: AjustesUsuario, respaldo: String?, onDetener: () -> Unit) {
     var confirmando by rememberSaveable { mutableStateOf(false) }
     val horaLimite = formatearHora(ajustes.horaLimiteMinutos)
     val desde = formatearHora(inicioVentana(ajustes.horaLimiteMinutos, ajustes.ventanaMinutos))
@@ -132,7 +163,11 @@ fun ModoNocheContenido(ajustes: AjustesUsuario, onDetener: () -> Unit) {
         Spacer(Modifier.height(24.dp))
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (ajustes.noMolestarActivado) LineaActivada(stringResource(R.string.modo_noche_no_molestar))
-            LineaActivada(stringResource(R.string.modo_noche_respaldo, horaLimite))
+            if (respaldo != null) {
+                LineaActivada(stringResource(R.string.modo_noche_respaldo, respaldo))
+            } else {
+                LineaAdvertencia(stringResource(R.string.modo_noche_sin_respaldo))
+            }
             val fuente = stringResource(
                 if (ajustes.fuente == FuenteDatos.SMARTWATCH) R.string.alarma_fuente_reloj else R.string.alarma_fuente_telefono,
             )
@@ -187,8 +222,17 @@ private fun LineaActivada(texto: String) {
     }
 }
 
+@Composable
+private fun LineaAdvertencia(texto: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Outlined.ErrorOutline, contentDescription = null, tint = Advertencia)
+        Spacer(Modifier.width(16.dp))
+        Text(texto, style = MaterialTheme.typography.bodyLarge, color = Texto)
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF070D17, heightDp = 900)
 @Composable
 private fun ModoNochePreview() {
-    DescansaTheme { ModoNocheContenido(ajustes = AjustesUsuario(), onDetener = {}) }
+    DescansaTheme { ModoNocheContenido(ajustes = AjustesUsuario(), respaldo = "07:00", onDetener = {}) }
 }

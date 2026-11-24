@@ -115,17 +115,73 @@ en pantalla.
 **Por qué:** son los mismos íconos de línea del prototipo y vienen como
 `ImageVector`, sin archivos extra. R8 elimina los que no se usan en la versión release.
 
+## D-11 · Permiso de alarmas exactas
+
+**Qué:** `USE_EXACT_ALARM`, y además `SCHEDULE_EXACT_ALARM` con `maxSdkVersion="32"`.
+
+**Por qué:** según la documentación oficial (consultada el 24/11/2026),
+`USE_EXACT_ALARM` "se concede automáticamente" y "el usuario no lo puede
+revocar". Está limitado a casos como las apps de despertador, que es nuestro
+caso. No existe antes de Android 13; en Android 12, `SCHEDULE_EXACT_ALARM`
+viene concedido. Si aun así Android no deja programar exactas, la app **no
+activa la noche** y lo explica: nunca dormimos sin alarma de respaldo.
+
+**Pendiente de verificar:** la política de Google Play para `USE_EXACT_ALARM`
+solo importa si se publica en Play, lo cual no es necesario para la entrega.
+
+## D-12 · Servicio de timbre tipo `systemExempted`
+
+**Qué:** el sonido de la alarma lo reproduce `TimbreService`, un servicio en
+primer plano de tipo `systemExempted`.
+
+**Por qué:** la documentación permite ese tipo a "apps con SCHEDULE_EXACT_ALARM
+o USE_EXACT_ALARM" y no pide permisos en tiempo de ejecución. Además, Android 17
+(targetSdk 37) exige que una app que reproduce audio en segundo plano tenga un
+servicio en primer plano y use el audio de alarma (`USAGE_ALARM`) con permiso de
+alarmas exactas. Iniciar el servicio desde el receptor de la alarma está
+permitido, porque las alarmas exactas están exentas de las restricciones de
+inicio en segundo plano.
+
+## D-13 · Estado de la alarma en almacenamiento protegido por dispositivo
+
+**Qué:** la alarma programada se guarda en `SharedPreferences` del
+almacenamiento "protegido por dispositivo", no en DataStore ni Room. Los
+receptores, el servicio y la pantalla de timbre son `directBootAware` y no usan Hilt.
+
+**Por qué:** tras reiniciar un teléfono con PIN o huella, hasta desbloquearlo
+solo se puede leer ese almacenamiento. Así la alarma se reprograma (con
+`LOCKED_BOOT_COMPLETED`) y suena aunque nadie desbloquee el teléfono.
+Solo se guardan horas (no son datos sensibles).
+
+## D-14 · Reglas de la alarma de respaldo
+
+- Si al reiniciar la alarma **ya debió sonar** mientras el teléfono estaba
+  apagado, suena de inmediato (es mejor despertar tarde que no despertar).
+- Al **cambiar la zona horaria**, la alarma normal se recalcula: 07:00 sigue
+  siendo 07:00 en la hora nueva. Una alarma pospuesta conserva su momento exacto.
+- La alarma **suena como máximo 30 minutos** y luego se detiene, para no agotar
+  la batería si el usuario no está cerca.
+- "Atrás" no apaga la alarma: solo **Detener** o **Posponer**.
+- Si el usuario negó las notificaciones, la alarma suena igual y, al abrir la
+  app, aparece la pantalla de timbre.
+
+## D-15 · Limitación conocida: "Forzar detención"
+
+Si el usuario usa **Ajustes de Android → Apps → Descansa → Forzar detención**,
+Android borra todas las alarmas de la app y ninguna app puede evitarlo. Cerrar
+la app desde "Recientes" **no** borra la alarma. Esto se documenta en el README
+y en las pruebas manuales.
+
 ---
 
 ## Decisiones previstas para las siguientes fases
 
 Se confirmarán con la documentación oficial vigente antes de implementarlas:
 
-- **Fase 1:** permiso de alarmas exactas. Una app de despertador puede declarar
-  `USE_EXACT_ALARM`; se verificará contra targetSdk 37 y la política de Play.
-  También `USE_FULL_SCREEN_INTENT` para la pantalla de timbre.
-- **Fase 2:** tipo de servicio en primer plano para el sensor (`health` o
-  `specialUse`) y sus permisos. Medida de actividad: desviación estándar de
+- **Fase 2:** tipo de servicio en primer plano para el sensor. La
+  documentación describe `health` para "apps de fitness" y le exige
+  `ACTIVITY_RECOGNITION` o `HIGH_SAMPLING_RATE_SENSORS`; hay que evaluar si
+  encaja o si conviene `specialUse`. Medida de actividad: desviación estándar de
   |a|/g por minuto.
 - **Fase 3:** comportamiento de los "Modos" de Android 15+ frente a
   `setInterruptionFilter`.
