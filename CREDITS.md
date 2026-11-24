@@ -19,7 +19,7 @@ que permitan uso y redistribución: preferentemente **CC0** o **CC BY**.
 
 | Fuente | Autor | Licencia |
 |---|---|---|
-| Nunito (pendiente de agregar) | Vernon Adams y colaboradores | SIL Open Font License 1.1 |
+| Work Sans (variable, `res/font/worksans_*.ttf`) | The Work Sans Project Authors — github.com/weiweihuanghuang/Work-Sans | SIL Open Font License 1.1 (texto completo en `docs/licencias/WorkSans-OFL.txt`) |
 
 ## Librerías
 

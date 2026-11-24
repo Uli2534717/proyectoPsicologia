@@ -50,7 +50,7 @@ Proyecto de Ética profesional de la UPT (ITIID403). Entrega: **2 de diciembre d
 
 | Pieza | Elección |
 |---|---|
-| Lenguaje / UI | Kotlin + Jetpack Compose + Material 3 (solo tema oscuro) |
+| Lenguaje / UI | Kotlin + Jetpack Compose + Material 3, sistema "Cartel sereno" (sección 10) |
 | Arquitectura | MVVM + Clean Architecture ligera (`feature` → `domain` ← `data`) |
 | DI | Hilt (KSP) |
 | BD | Room (`noches`, `epocas`, `pendientes`, `estadisticas_sonido`) con esquemas en `app/schemas/` |
@@ -67,8 +67,7 @@ Proyecto de Ética profesional de la UPT (ITIID403). Entrega: **2 de diciembre d
 app/src/main/java/com/upt/descansa/
 ├── DescansaApp.kt / MainActivity.kt / MainViewModel.kt
 ├── core/
-│   ├── theme/          # Color.kt = tokens del prototipo (única fuente de colores)
-│   ├── designsystem/   # BotonPrincipal, TarjetaDescansa, ChipOpcion, PlantillaPaso...
+│   ├── designsystem/   # theme/ (colores, Work Sans, formas, temas), motion/, components/ (uno por archivo)
 │   ├── navigation/     # Rutas.kt + DescansaNavegacion.kt (todo el flujo en un archivo)
 │   └── util/           # Tiempo.kt (horas y ventanas que cruzan medianoche)
 ├── domain/             # modelos, interfaces de repositorios, casos de uso (Kotlin puro)
@@ -76,7 +75,7 @@ app/src/main/java/com/upt/descansa/
 └── feature/
     ├── bienvenida/  inicio/  modonoche/  manana/  aprender/  ajustes/
     └── noche/       # los 5 pasos: pendientes/ respiracion/ relajacion/ sonidos/ alarma/
-# Fases 1–3 agregarán: sistema/alarma, sistema/noche, sistema/nomolestar y motor/ (Kotlin puro).
+├── sistema/            # alarma/ (Fase 1); Fases 2–3: noche/, nomolestar/ y motor/ (Kotlin puro)
 ```
 
 ## 6. Fases (prioridad P0 primero)
@@ -84,7 +83,7 @@ app/src/main/java/com/upt/descansa/
 | Fase | Contenido | Prioridad |
 |---|---|---|
 | 0 | Base, tema, navegación por las 11 pantallas, BD, bienvenida | P0 ✅ |
-| 1 | Alarma de respaldo: AlarmScheduler, receivers, pantalla de timbre, volumen creciente | P0 |
+| 1 | Alarma de respaldo: AlarmScheduler, receivers, pantalla de timbre, volumen creciente | P0 ✅ |
 | 2 | Servicio nocturno, SensorCollector, EpochAggregator, WakeDecisionEngine + JUnit, simulador | P0 |
 | 3 | No molestar con guardado y restauración | P0 |
 | 4 | Pendientes, respiración y relajación completos | P0 |
@@ -120,3 +119,69 @@ En Windows, fuera de Android Studio:
 
 `main` ← `develop` ← `feature/<modulo>`, `fix/...`, `docs/...`. Todo entra
 por PR. Commits con Conventional Commits en español. Ver `CONTRIBUTING.md`.
+
+## 10. Sistema de diseño "Cartel sereno"
+
+Lienzo blanco, mucho espacio, **una sola tipografía (Work Sans)** y palabras
+gigantes de color que identifican cada sección, como un cartel impreso.
+Está inspirado en los tokens de una guía de estilo de otra marca: **no copiar
+nombres, logotipos, textos ni imágenes de esa marca**.
+
+**Dónde vive:** `core/designsystem/` → `theme/` (Color, Type, Formas, Theme),
+`motion/Movimiento.kt` y `components/` (un componente por archivo, con
+`@PreviewLightDark`). Las pantallas NO crean botones, tarjetas ni colores propios.
+
+### Colores (`theme/Color.kt`)
+| Token | Hex | Uso |
+|---|---|---|
+| `VerdeBosque` | #035542 | ÚNICO color interactivo (tema claro): botones, enlaces, etiquetas, íconos activos |
+| `AzulCartel` | #2B7BB9 | Solo bordes y subrayados de acciones secundarias. Nunca relleno |
+| `TurquesaSereno` | #56DDDB | Decorativo (palabras gigantes, separadores). Interactivo en tema nocturno |
+| `AmarilloMantequilla` | #F9E9A9 | Solo decorativo |
+| `GrisCarbon` | #333333 | Texto y bordes |
+| `BlancoLienzo` | #FFFFFF | Fondo de todo |
+| Nocturno | #0B1F19 / #F2F2EC | Fondo / texto del tema nocturno |
+
+- Colores decorativos: `LocalColoresCartel.current` (turquesa = noche: Pendientes,
+  Respiración, Relajación, Sonidos, Alarma, Modo noche; amarillo = día: Bienvenida,
+  Inicio, Mañana, Aprender, Ajustes).
+- **Nunca** turquesa ni amarillo en texto funcional menor a 32 sp.
+- Tema: Automático (sigue al sistema) / Claro / Oscuro en Ajustes.
+  **Respiración, Modo noche y la pantalla de timbre siempre usan `TemaNocturno`.**
+
+### Tipografía (`theme/Type.kt` → `TipoCartel`)
+`cartelXL` 120 sp · `cartel` 96 sp (900, interlineado 0.70, se ajustan al ancho) ·
+`subtitulo` 32 sp/900 · `titulo` 20 sp/500 · `cuerpo` 17 sp/400 ·
+`etiqueta` 14 sp/500 MAYÚSCULAS · `leyenda` 14 sp/400 MAYÚSCULAS · `hora` 64 sp/900.
+Los tamaños de cartel **nunca** se usan para texto de interfaz. Todo en `sp`.
+
+### Formas, espacio y elevación
+- Radios SOLO: 0 (etiquetas), 4 dp (tarjetas, campos, imágenes), 20 dp
+  (botones), píldora (el botón principal).
+- Espacios SOLO: 4, 8, 10, 12, 16, 20, 24, 30, 50 dp (`Espacio`). Márgenes de
+  pantalla 20, entre secciones 50, entre elementos 20, relleno de tarjeta 20.
+- **Sin sombras, elevación, degradados, vidrio ni texturas.** Bordes de 1.5 dp.
+- **Ningún botón con relleno de color.** Presionado = borde 2.5 dp + escala 0.97.
+- Selección = borde 2.5 dp en color interactivo **y** ✓ (nunca solo color).
+
+### Estructura de cada pantalla
+`PantallaCartel` (o `PlantillaPaso` en los 5 pasos): encabezado (atrás o
+`Logotipo` + `MenuMinimo`), `PalabraCartel` con la imagen encimada, título real
+accesible (`TituloPantalla`), contenido, y **un solo `BotonPildora`**.
+No hay barra inferior: la navegación es `MenuPantallaCompleta`.
+
+### Imágenes
+Fotos de objetos sobre fondo blanco, sin personas (`img_*`). Lista y cómo
+reemplazarlas: `docs/IMAGENES.md`. Siempre con `contentDescription` en español.
+Íconos de Material solo en controles (reproducir, pausar, agregar, estado).
+
+### Movimiento (`motion/Movimiento.kt`)
+Duraciones 150 / 300 / 600 ms; `FastOutSlowInEasing` (entrada) y
+`LinearOutSlowInEasing` (salida). Sin rebotes ni brillos.
+Si `animacionesReducidas()` es `true`: fundido o nada, sello y separador quietos,
+círculo de respiración estático.
+
+### Accesibilidad
+`PalabraCartel` y `SeparadorOnda` son decorativos (`clearAndSetSemantics`).
+Objetivos táctiles ≥ 48 dp. `FilaDeTres` pasa a desplazamiento horizontal en
+pantallas < 360 dp o con letra grande del sistema.

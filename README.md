@@ -20,6 +20,10 @@ y control total de tus datos (exportar y borrar).
 🔒 **Privacidad:** todo se guarda solo en tu teléfono. Sin cuentas, sin
 servidores, sin anuncios. Ver [docs/PRIVACIDAD.md](docs/PRIVACIDAD.md).
 
+## Diseño
+
+Estilo **"Cartel sereno"**: lienzo blanco, Work Sans y palabras gigantes de color por sección. Reglas completas en `CLAUDE.md` (sección 10) e imágenes en [docs/IMAGENES.md](docs/IMAGENES.md).
+
 ## Capturas
 
 | Bienvenida | Inicio | Alarma | Modo noche | Mañana |
