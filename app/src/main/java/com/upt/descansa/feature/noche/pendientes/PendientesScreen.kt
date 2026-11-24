@@ -43,7 +43,7 @@ import com.upt.descansa.data.local.entity.MAX_CARACTERES_PENDIENTE
 data class PendienteUi(val id: Long, val texto: String, val hecho: Boolean)
 
 /**
- * Pantalla 3 · Pendientes, paso 1 de 5 (sección turquesa: SUELTA).
+ * Pantalla 3 · Pendientes, paso 1 de 5 (sección de noche: SUELTA).
  *
  * Todavía en memoria: la Fase 4 lo conecta a la tabla `pendientes` y agrega
  * la animación de "soltar" (la entrada sube y se desvanece y aparece SUELTA).
@@ -79,7 +79,7 @@ fun PendientesContenido(
     PlantillaPaso(
         paso = 1,
         palabra = stringResource(R.string.palabra_pendientes),
-        colorPalabra = LocalColoresCartel.current.turquesa,
+        colorPalabra = LocalColoresCartel.current.noche,
         titulo = stringResource(R.string.pendientes_titulo),
         descripcion = stringResource(R.string.pendientes_subtitulo),
         imagen = R.drawable.img_vaciado_cuaderno,

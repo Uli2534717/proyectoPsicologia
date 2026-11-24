@@ -51,7 +51,7 @@ import com.upt.descansa.feature.noche.sonidos.SonidosScreen
  *
  * Transición "cartel": la pantalla nueva entra desde abajo y la anterior sale
  * hacia arriba (300 ms); como cada sección tiene su color, la palabra gigante
- * cambia de turquesa a amarillo o al revés. Con animaciones reducidas: fundido.
+ * cambia de violeta a orquídea o al revés. Con animaciones reducidas: fundido.
  *
  * Las pantallas no conocen al NavController: reciben lambdas. Todo el flujo
  * de la app se lee en este archivo.
@@ -142,15 +142,15 @@ fun DescansaNavegacion(
         }
         MenuPantallaCompleta(
             entradas = listOf(
-                EntradaMenu(stringResource(R.string.menu_inicio), colores.amarillo) { ir(RutaInicio) },
-                EntradaMenu(stringResource(R.string.menu_noche), colores.turquesa) { ir(RutaPendientes) },
-                EntradaMenu(stringResource(R.string.menu_respiracion), colores.turquesa) { ir(RutaRespiracion) },
-                EntradaMenu(stringResource(R.string.menu_relajacion), colores.turquesa) { ir(RutaRelajacion) },
-                EntradaMenu(stringResource(R.string.menu_sonidos), colores.turquesa) { ir(RutaSonidos) },
-                EntradaMenu(stringResource(R.string.menu_alarma), colores.turquesa) { ir(RutaAlarma) },
-                EntradaMenu(stringResource(R.string.menu_manana), colores.amarillo) { ir(RutaManana) },
-                EntradaMenu(stringResource(R.string.menu_aprender), colores.amarillo) { ir(RutaAprender) },
-                EntradaMenu(stringResource(R.string.menu_ajustes), colores.amarillo) { ir(RutaAjustes) },
+                EntradaMenu(stringResource(R.string.menu_inicio), colores.dia) { ir(RutaInicio) },
+                EntradaMenu(stringResource(R.string.menu_noche), colores.noche) { ir(RutaPendientes) },
+                EntradaMenu(stringResource(R.string.menu_respiracion), colores.noche) { ir(RutaRespiracion) },
+                EntradaMenu(stringResource(R.string.menu_relajacion), colores.noche) { ir(RutaRelajacion) },
+                EntradaMenu(stringResource(R.string.menu_sonidos), colores.noche) { ir(RutaSonidos) },
+                EntradaMenu(stringResource(R.string.menu_alarma), colores.noche) { ir(RutaAlarma) },
+                EntradaMenu(stringResource(R.string.menu_manana), colores.dia) { ir(RutaManana) },
+                EntradaMenu(stringResource(R.string.menu_aprender), colores.dia) { ir(RutaAprender) },
+                EntradaMenu(stringResource(R.string.menu_ajustes), colores.dia) { ir(RutaAjustes) },
             ),
             onCerrar = { menuAbierto = false },
         )

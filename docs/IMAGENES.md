@@ -1,7 +1,8 @@
 # Imágenes de la app
 
 Estilo "Cartel sereno": **fotografías de objetos sobre fondo blanco**, sin
-personas ni escenas. Las imágenes de prueba actuales son marcadores vectoriales
+personas ni escenas. Mientras no hay foto, la app DIBUJA el objeto con un ícono
+de línea morado (ver `Ilustraciones.kt`); el archivo actual es un marcador vectorial
 (`.xml`) con el mismo nombre que tendrá la foto definitiva.
 
 ## Cómo reemplazar una imagen
@@ -13,6 +14,7 @@ personas ni escenas. Las imágenes de prueba actuales son marcadores vectoriales
 4. **Borra el `.xml`** del mismo nombre. Si hay dos archivos con el mismo
    nombre, el proyecto no compila.
 5. Si la foto es de terceros, anota autor y licencia en `CREDITS.md`.
+6. Actualiza su descripción de TalkBack en `strings.xml` (hoy describe el dibujo).
 
 ## Lista
 

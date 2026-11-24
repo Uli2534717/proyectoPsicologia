@@ -65,7 +65,7 @@ private val respiracionCuadrada = listOf(
 private const val ESCALA_MINIMA = 0.55f
 
 /**
- * Pantalla 4 · Respiración guiada, paso 2 de 5 (turquesa: RESPIRA).
+ * Pantalla 4 · Respiración guiada, paso 2 de 5 (sección de noche: RESPIRA).
  * SIEMPRE en tema nocturno para no deslumbrar.
  *
  * El RITMO lo marca un temporizador (`delay` por fase), no la duración de la
@@ -98,7 +98,7 @@ fun RespiracionScreen(onAtras: () -> Unit, onSiguiente: () -> Unit) {
         PlantillaPaso(
             paso = 2,
             palabra = stringResource(R.string.palabra_respiracion),
-            colorPalabra = LocalColoresCartel.current.turquesa,
+            colorPalabra = LocalColoresCartel.current.noche,
             titulo = stringResource(R.string.respiracion_titulo),
             descripcion = stringResource(R.string.respiracion_subtitulo),
             textoBoton = stringResource(R.string.siguiente),
@@ -127,7 +127,7 @@ fun RespiracionScreen(onAtras: () -> Unit, onSiguiente: () -> Unit) {
                     liveRegion = LiveRegionMode.Polite
                 },
             ) { palabra ->
-                PalabraCartel(palabra, LocalColoresCartel.current.turquesa, animarEntrada = false)
+                PalabraCartel(palabra, LocalColoresCartel.current.noche, animarEntrada = false)
             }
             EtiquetaCategoria(stringResource(R.string.duracion))
             SelectorOpciones(
@@ -140,10 +140,10 @@ fun RespiracionScreen(onAtras: () -> Unit, onSiguiente: () -> Unit) {
     }
 }
 
-/** Círculo de SOLO contorno (2 dp, turquesa) con un anillo guía fijo. */
+/** Círculo de SOLO contorno (2 dp, violeta) con un anillo guía fijo. */
 @Composable
 private fun CirculoRespiracion(escala: Float) {
-    val turquesa = LocalColoresCartel.current.turquesa
+    val violeta = LocalColoresCartel.current.noche
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -154,8 +154,8 @@ private fun CirculoRespiracion(escala: Float) {
         Canvas(Modifier.size(240.dp)) {
             val grosor = Bordes.sello.toPx()
             val radioMaximo = size.minDimension / 2 - grosor
-            drawCircle(turquesa.copy(alpha = 0.35f), radius = radioMaximo, style = Stroke(width = grosor / 2))
-            drawCircle(turquesa, radius = radioMaximo * escala, style = Stroke(width = grosor))
+            drawCircle(violeta.copy(alpha = 0.35f), radius = radioMaximo, style = Stroke(width = grosor / 2))
+            drawCircle(violeta, radius = radioMaximo * escala, style = Stroke(width = grosor))
         }
     }
 }

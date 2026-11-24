@@ -44,7 +44,7 @@ private val articulos = listOf(
 )
 
 /**
- * Pantalla 10 · Aprender (sección amarilla: APRENDE).
+ * Pantalla 10 · Aprender (sección de día: APRENDE).
  *
  * El consejo del día lleva el SelloDestacado; los artículos van en FilaDeTres
  * y el cuarto aparte. En la Fase 6 el contenido vendrá de `learn.json` (con
@@ -55,7 +55,7 @@ fun AprenderScreen() {
     val esquema = MaterialTheme.colorScheme
     PantallaCartel(
         palabra = stringResource(R.string.palabra_aprender),
-        colorPalabra = LocalColoresCartel.current.amarillo,
+        colorPalabra = LocalColoresCartel.current.dia,
         titulo = stringResource(R.string.aprender_titulo),
     ) {
         // Consejo de hoy con sello destacado encimado arriba a la izquierda.

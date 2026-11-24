@@ -3,7 +3,7 @@
     <!--
         Tema "nativo" de la ventana. Compose dibuja todo lo demás, pero este
         color se ve un instante al abrir la app. Sigue el modo del teléfono:
-        lienzo blanco de día (values/) y morado noche de noche (values-night/),
+        lienzo lila de día (values/) y morado noche de noche (values-night/),
         para que no haya destellos.
     -->
     <style name="Theme.Descansa" parent="android:Theme.Material.Light.NoActionBar">

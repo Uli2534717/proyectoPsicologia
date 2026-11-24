@@ -144,9 +144,9 @@ private fun MenuPantallaCompletaPreview() {
         val colores = LocalColoresCartel.current
         ContenidoMenu(
             entradas = listOf(
-                EntradaMenu("Inicio", colores.amarillo) {},
-                EntradaMenu("Preparar mi noche", colores.turquesa) {},
-                EntradaMenu("Aprender", colores.amarillo) {},
+                EntradaMenu("Inicio", colores.dia) {},
+                EntradaMenu("Preparar mi noche", colores.noche) {},
+                EntradaMenu("Aprender", colores.dia) {},
             ),
             onCerrar = {},
         )

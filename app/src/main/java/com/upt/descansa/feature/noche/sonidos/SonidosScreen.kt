@@ -70,7 +70,7 @@ private val catalogo = listOf(
 private val duracionesApagado = listOf(15, 30, 60)
 
 /**
- * Pantalla 6 · Sonidos, paso 4 de 5 (sección turquesa: SUEÑA).
+ * Pantalla 6 · Sonidos, paso 4 de 5 (sección de noche: SUEÑA).
  *
  * Todavía sin audio: los botones de reproducir no suenan. En la Fase 5 llegan
  * la reproducción en bucle, el apagado gradual, los favoritos guardados, la
@@ -88,7 +88,7 @@ fun SonidosScreen(onAtras: () -> Unit, onSiguiente: () -> Unit) {
     PlantillaPaso(
         paso = 4,
         palabra = stringResource(R.string.palabra_sonidos),
-        colorPalabra = LocalColoresCartel.current.turquesa,
+        colorPalabra = LocalColoresCartel.current.noche,
         titulo = stringResource(R.string.sonidos_titulo),
         imagen = recomendado.imagen,
         descripcionImagen = stringResource(recomendado.descripcionImagen),

@@ -35,7 +35,7 @@ enum class TamanoCartel { XL, NORMAL }
  * - Entrada: sube 40 dp y se revela de abajo hacia arriba en 600 ms, como un
  *   cartel que se pega. Con animaciones reducidas, solo aparece.
  *
- * @param color turquesa (noche) o amarillo (día), de `LocalColoresCartel`.
+ * @param color violeta (noche) u orquídea (día), de `LocalColoresCartel`.
  */
 @Composable
 fun PalabraCartel(
@@ -77,6 +77,6 @@ fun PalabraCartel(
 @Composable
 private fun PalabraCartelPreview() {
     VistaPrevia {
-        PalabraCartel("RESPIRA", LocalColoresCartel.current.turquesa, animarEntrada = false)
+        PalabraCartel("RESPIRA", LocalColoresCartel.current.noche, animarEntrada = false)
     }
 }

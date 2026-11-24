@@ -109,7 +109,7 @@ private fun ProgresoPasos(paso: Int) {
 private fun PlantillaPasoPreview() {
     VistaPrevia {
         PlantillaPaso(
-            paso = 2, palabra = "RESPIRA", colorPalabra = LocalColoresCartel.current.turquesa,
+            paso = 2, palabra = "RESPIRA", colorPalabra = LocalColoresCartel.current.noche,
             titulo = "Respira con calma", textoBoton = "Siguiente",
             onAtras = {}, onBoton = {}, onOmitir = {},
         ) { AvisoCartel("Contenido") }

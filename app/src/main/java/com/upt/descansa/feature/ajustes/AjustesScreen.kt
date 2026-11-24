@@ -82,7 +82,7 @@ class AjustesViewModel @Inject constructor(
 private val opcionesPosponer = listOf(5, 10, 15)
 
 /**
- * Pantalla 11 · Ajustes (sección amarilla: AJUSTA).
+ * Pantalla 11 · Ajustes (sección de día: AJUSTA).
  *
  * Funcionan: tema, sensibilidad, posponer, No molestar y modo desarrollador
  * (con "Probar alarma en 2 minutos"). Permisos con su estado, exportar y borrar
@@ -114,7 +114,7 @@ fun AjustesContenido(
 
     PantallaCartel(
         palabra = stringResource(R.string.palabra_ajustes),
-        colorPalabra = LocalColoresCartel.current.amarillo,
+        colorPalabra = LocalColoresCartel.current.dia,
         titulo = stringResource(R.string.ajustes_titulo),
         imagen = R.drawable.img_ajustes_audifonos,
         descripcionImagen = stringResource(R.string.img_ajustes_audifonos),

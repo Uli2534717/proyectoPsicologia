@@ -32,12 +32,12 @@ import com.upt.descansa.core.designsystem.theme.LocalColoresCartel
  * Línea en zigzag ANGULAR (sin curvas) para separar secciones.
  * Se desplaza suavemente en horizontal; con animaciones reducidas se queda quieta.
  *
- * @param color turquesa (decorativo) o el color interactivo.
+ * @param color violeta decorativo (por defecto) o el color interactivo.
  */
 @Composable
 fun SeparadorOnda(
     modifier: Modifier = Modifier,
-    color: Color = LocalColoresCartel.current.turquesa,
+    color: Color = LocalColoresCartel.current.noche,
 ) {
     val reducidas = animacionesReducidas()
     val transicion = rememberInfiniteTransition(label = "onda")

@@ -245,23 +245,24 @@
     <string name="ajustes_tema_oscuro">Oscuro</string>
     <string name="ajustes_tema_detalle">Respiración, Modo noche y la alarma siempre usan el tema nocturno para no deslumbrarte.</string>
 
-    <!-- Descripciones de imágenes para TalkBack (ver docs/IMAGENES.md) -->
-    <string name="img_bienvenida_lampara_luna">Lámpara con forma de luna</string>
-    <string name="img_inicio_almohada">Una almohada</string>
-    <string name="img_vaciado_cuaderno">Un cuaderno abierto</string>
-    <string name="img_respiracion_vela">Una vela encendida</string>
-    <string name="img_relajacion_manta">Una manta doblada</string>
-    <string name="img_sonido_lluvia">Lluvia</string>
-    <string name="img_sonido_ruido_blanco">Un ventilador</string>
-    <string name="img_sonido_olas">Una caracola de mar</string>
-    <string name="img_sonido_bosque">Una piña de pino</string>
+    <!-- Descripciones de imágenes para TalkBack. Describen el DIBUJO actual;
+         al poner la foto real, actualizar el texto (ver docs/IMAGENES.md). -->
+    <string name="img_bienvenida_lampara_luna">Una luna</string>
+    <string name="img_inicio_almohada">Una cama</string>
+    <string name="img_vaciado_cuaderno">Una hoja con notas</string>
+    <string name="img_respiracion_vela">Aire en movimiento</string>
+    <string name="img_relajacion_manta">Una persona meditando</string>
+    <string name="img_sonido_lluvia">Un paraguas</string>
+    <string name="img_sonido_ruido_blanco">Ondas de sonido</string>
+    <string name="img_sonido_olas">Olas</string>
+    <string name="img_sonido_bosque">Un bosque</string>
     <string name="img_alarma_despertador">Un despertador</string>
-    <string name="img_modo_noche_lampara">Una lámpara de buró</string>
+    <string name="img_modo_noche_lampara">Luna y estrellas</string>
     <string name="img_manana_taza">Una taza</string>
-    <string name="img_aprender_lampara">Una lámpara</string>
+    <string name="img_aprender_lampara">Un foco</string>
     <string name="img_aprender_reloj_arena">Un reloj de arena</string>
     <string name="img_aprender_te">Una taza de té</string>
-    <string name="img_aprender_cuaderno">Un cuaderno</string>
+    <string name="img_aprender_cuaderno">Una cabeza pensando</string>
     <string name="img_ajustes_audifonos">Unos audífonos</string>
 
     <!-- Textos cortos para FilaDeTres -->

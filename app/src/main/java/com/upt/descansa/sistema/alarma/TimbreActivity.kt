@@ -107,7 +107,7 @@ class TimbreActivity : ComponentActivity() {
 }
 
 /**
- * Contenido de la pantalla de timbre (turquesa: DESPIERTA), siempre en tema nocturno.
+ * Contenido de la pantalla de timbre (sección de noche: DESPIERTA), siempre en tema nocturno.
  * La palabra DESPIERTA crece de 0.9 a 1.0 en 30 s, al mismo ritmo que el volumen.
  */
 @Composable
@@ -127,7 +127,7 @@ private fun TimbreContenido(posponerMinutos: Int, onDetener: () -> Unit, onPospo
 
     PantallaCartel(
         palabra = stringResource(R.string.palabra_alarma),
-        colorPalabra = LocalColoresCartel.current.turquesa,
+        colorPalabra = LocalColoresCartel.current.noche,
         titulo = stringResource(R.string.timbre_titulo),
         descripcion = stringResource(R.string.timbre_subtitulo),
         imagen = R.drawable.img_alarma_despertador,

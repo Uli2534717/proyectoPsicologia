@@ -47,7 +47,7 @@ private val otrasHerramientas = listOf(
 )
 
 /**
- * Pantalla 2 · Inicio (sección amarilla: DUERME, tamaño XL).
+ * Pantalla 2 · Inicio (sección de día: DUERME, tamaño XL).
  *
  * @param ultimaNoche resumen de la noche anterior; `null` muestra el estado vacío.
  *        Aún siempre null: en la Fase 2 un ViewModel lo leerá de la tabla `noches`.
@@ -60,7 +60,7 @@ fun InicioScreen(
 ) {
     PantallaCartel(
         palabra = stringResource(R.string.palabra_inicio),
-        colorPalabra = LocalColoresCartel.current.amarillo,
+        colorPalabra = LocalColoresCartel.current.dia,
         titulo = stringResource(R.string.inicio_saludo),
         descripcion = stringResource(R.string.inicio_subtitulo),
         tamano = TamanoCartel.XL,

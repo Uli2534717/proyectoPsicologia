@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 /** Ventanas de despertar permitidas (sección 6.1). */
 private val ventanas = listOf(15, 20, 30)
 
-/** Pantalla 7 · Alarma inteligente, paso 5 de 5 (sección turquesa: DESPIERTA). */
+/** Pantalla 7 · Alarma inteligente, paso 5 de 5 (sección de noche: DESPIERTA). */
 @Composable
 fun AlarmaScreen(
     onAtras: () -> Unit,
@@ -180,7 +180,7 @@ fun AlarmaContenido(
     PlantillaPaso(
         paso = 5,
         palabra = stringResource(R.string.palabra_alarma),
-        colorPalabra = LocalColoresCartel.current.turquesa,
+        colorPalabra = LocalColoresCartel.current.noche,
         titulo = stringResource(R.string.alarma_titulo),
         imagen = R.drawable.img_alarma_despertador,
         descripcionImagen = stringResource(R.string.img_alarma_despertador),

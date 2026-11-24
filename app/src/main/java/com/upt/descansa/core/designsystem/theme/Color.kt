@@ -5,57 +5,68 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 // =============================================================================
-//  Paleta "Cartel sereno". ÚNICA fuente de colores de la app.
-//  Reglas (ver CLAUDE.md → Sistema de diseño):
-//  - MoradoProfundo es el ÚNICO color interactivo (en tema claro);
-//    LavandaNoche lo es en el tema nocturno.
-//  - AzulCartel solo en bordes y subrayados de acciones secundarias, nunca relleno.
-//  - Turquesa y amarillo son DECORATIVOS: palabras gigantes y separadores.
-//    Nunca en texto funcional menor a 32 sp.
-//  - Sin grises de fondo, sin sombras ni degradados.
+//  Paleta "Cartel sereno" en MORADO (pedido del equipo, D-21 y D-23).
+//  ÚNICA fuente de colores de la app.
+//  - De día: lienzo lila muy suave, texto carbón morado, morado profundo interactivo.
+//  - De noche: fondo morado casi negro, texto hueso, lavanda interactiva.
+//  - Las palabras gigantes son DECORATIVAS, en dos tonos de morado:
+//    violeta (secciones de noche) y orquídea (secciones de día).
+//    Nunca se usan en texto funcional menor a 32 sp.
+//  - Sin sombras ni degradados.
 // =============================================================================
 
-// --- Tema claro ---
-/**
- * Morado profundo: color interactivo del tema claro (botones, enlaces,
- * etiquetas, íconos activos). Contraste ≈10:1 sobre blanco.
- * Reemplaza al verde de la guía original (pedido del equipo, D-21).
- */
-val MoradoProfundo = Color(0xFF4B2E83)
-val AzulCartel = Color(0xFF2B7BB9)
-val TurquesaSereno = Color(0xFF56DDDB)
-val AmarilloMantequilla = Color(0xFFF9E9A9)
-val GrisCarbon = Color(0xFF333333)
-val BlancoLienzo = Color(0xFFFFFFFF)
+// --- Tema de día (lila claro) ---
+/** Fondo de todas las pantallas de día: lila muy suave (antes blanco). */
+val LilaLienzo = Color(0xFFF6F2FF)
 
-// --- Tema nocturno (derivado con las mismas reglas) ---
+/** Fondo del marco de los dibujos de objetos (un lila un poco más intenso). */
+val LilaMarco = Color(0xFFECE3FF)
+
+/** Texto y bordes de día: carbón con matiz morado (≈13.7:1 sobre LilaLienzo). */
+val CarbonMorado = Color(0xFF2B2140)
+
+/** ÚNICO color interactivo de día: botones, enlaces, etiquetas (≈9.4:1 sobre LilaLienzo). */
+val MoradoProfundo = Color(0xFF4B2E83)
+
+/** Acciones secundarias de día: bordes y subrayados (≈4.6:1). Nunca relleno. */
+val VioletaSecundario = Color(0xFF7A5BC4)
+
+// --- Tema de noche ---
 /** Fondo nocturno: morado casi negro. */
 val MoradoNoche = Color(0xFF160F26)
 
-/** Color interactivo del tema nocturno: lavanda clara, ≈9:1 sobre MoradoNoche. */
+/** Marco de los dibujos de objetos de noche. */
+val MoradoMarcoNoche = Color(0xFF241A3B)
+
+/** Texto nocturno: blanco hueso con un toque lila. */
+val TextoNoche = Color(0xFFF1ECFA)
+
+/** Color interactivo nocturno: lavanda clara (≈9:1 sobre MoradoNoche). */
 val LavandaNoche = Color(0xFFB9A8FF)
 
-/** Texto nocturno: blanco hueso, menos agresivo que el blanco puro de noche. */
-val TextoNoche = Color(0xFFF2F2EC)
+/** Acciones secundarias de noche: rosa lila (≈11:1). */
+val RosaLilaNoche = Color(0xFFE7B8F5)
+
+// --- Palabras gigantes (decorativas) ---
+/** Secciones de noche (Pendientes, Respiración, Relajación, Sonidos, Alarma, Modo noche). */
+val VioletaCartel = Color(0xFF8B6FE8)
+
+/** Secciones de día (Bienvenida, Inicio, Mañana, Aprender, Ajustes). */
+val OrquideaCartel = Color(0xFFC7A6F2)
 
 /**
- * Azul secundario aclarado para fondo nocturno. SUPOSICIÓN: el prompt no define
- * el azul nocturno; AzulCartel sobre MoradoNoche da ≈3.6:1, poco para un borde
- * fino. Este da ≈7:1 (ver DECISIONES.md D-18).
+ * Colores DECORATIVOS, separados de los funcionales de Material para que
+ * nadie los use por error en un botón o un texto pequeño.
+ * Se leen con `LocalColoresCartel.current`.
  */
-val AzulNoche = Color(0xFF8CC0EA)
-
-/** Colores DECORATIVOS de las palabras gigantes. Se leen con `LocalColoresCartel.current`. */
 @Immutable
 data class ColoresCartel(
-    /** Noche, calma, frío: Pendientes, Respiración, Relajación, Sonidos, Alarma, Modo noche. */
-    val turquesa: Color = TurquesaSereno,
-    /** Día, ánimo, calidez: Bienvenida, Inicio, Mañana, Aprender, Ajustes. */
-    val amarillo: Color = AmarilloMantequilla,
+    /** Palabra gigante de las secciones de noche. */
+    val noche: Color = VioletaCartel,
+    /** Palabra gigante de las secciones de día. */
+    val dia: Color = OrquideaCartel,
+    /** Fondo del marco de los dibujos de objetos. */
+    val fondoIlustracion: Color = LilaMarco,
 )
 
-/**
- * Separa los colores decorativos de los funcionales de Material, para que
- * nadie use por error el amarillo en un botón o un texto pequeño.
- */
 val LocalColoresCartel = staticCompositionLocalOf { ColoresCartel() }

@@ -182,7 +182,7 @@ private fun PantallaCartelPreview() {
     VistaPrevia {
         PantallaCartel(
             palabra = "SUEÑA",
-            colorPalabra = LocalColoresCartel.current.turquesa,
+            colorPalabra = LocalColoresCartel.current.noche,
             titulo = "Elige tu sonido",
             imagen = R.drawable.img_sonido_lluvia,
             descripcionImagen = "Lluvia",

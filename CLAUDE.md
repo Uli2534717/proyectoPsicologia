@@ -122,7 +122,7 @@ por PR. Commits con Conventional Commits en español. Ver `CONTRIBUTING.md`.
 
 ## 10. Sistema de diseño "Cartel sereno"
 
-Lienzo blanco, mucho espacio, **una sola tipografía (Work Sans)** y palabras
+Lienzo lila, mucho espacio, **una sola tipografía (Work Sans)** y palabras
 gigantes de color que identifican cada sección, como un cartel impreso.
 Está inspirado en los tokens de una guía de estilo de otra marca: **no copiar
 nombres, logotipos, textos ni imágenes de esa marca**.
@@ -134,18 +134,18 @@ nombres, logotipos, textos ni imágenes de esa marca**.
 ### Colores (`theme/Color.kt`)
 | Token | Hex | Uso |
 |---|---|---|
-| `MoradoProfundo` | #4B2E83 | ÚNICO color interactivo (tema claro): botones, enlaces, etiquetas, íconos activos |
-| `AzulCartel` | #2B7BB9 | Solo bordes y subrayados de acciones secundarias. Nunca relleno |
-| `TurquesaSereno` | #56DDDB | Solo decorativo (palabras gigantes de noche, separadores) |
-| `AmarilloMantequilla` | #F9E9A9 | Solo decorativo |
-| `GrisCarbon` | #333333 | Texto y bordes |
-| `BlancoLienzo` | #FFFFFF | Fondo de todo |
-| Nocturno | #160F26 / #F2F2EC / #B9A8FF | Fondo (`MoradoNoche`) / texto / interactivo (`LavandaNoche`) |
+| `MoradoProfundo` | #4B2E83 | ÚNICO color interactivo de día: botones, enlaces, etiquetas, íconos activos |
+| `VioletaSecundario` | #7A5BC4 | Solo bordes y subrayados de acciones secundarias. Nunca relleno |
+| `VioletaCartel` | #8B6FE8 | Decorativo: palabras gigantes de las secciones de noche y zigzag |
+| `OrquideaCartel` | #C7A6F2 | Decorativo: palabras gigantes de las secciones de día |
+| `CarbonMorado` | #2B2140 | Texto y bordes de día |
+| `LilaLienzo` | #F6F2FF | Fondo de día (lila muy suave) |
+| Nocturno | #160F26 / #F1ECFA / #B9A8FF | Fondo (`MoradoNoche`) / texto / interactivo (`LavandaNoche`) |
 
-- Colores decorativos: `LocalColoresCartel.current` (turquesa = noche: Pendientes,
-  Respiración, Relajación, Sonidos, Alarma, Modo noche; amarillo = día: Bienvenida,
+- Colores decorativos: `LocalColoresCartel.current` (`noche` = violeta: Pendientes,
+  Respiración, Relajación, Sonidos, Alarma, Modo noche; `dia` = orquídea: Bienvenida,
   Inicio, Mañana, Aprender, Ajustes).
-- **Nunca** turquesa ni amarillo en texto funcional menor a 32 sp.
+- **Nunca** violeta ni orquídea decorativos en texto funcional menor a 32 sp.
 - Tema: Automático (sigue al sistema) / Claro / Oscuro en Ajustes.
   **Respiración, Modo noche y la pantalla de timbre siempre usan `TemaNocturno`.**
 
@@ -171,7 +171,8 @@ accesible (`TituloPantalla`), contenido, y **un solo `BotonPildora`**.
 No hay barra inferior: la navegación es `MenuPantallaCompleta`.
 
 ### Imágenes
-Fotos de objetos sobre fondo blanco, sin personas (`img_*`). Lista y cómo
+Fotos de objetos sobre fondo blanco, sin personas (`img_*`). Mientras no hay
+foto se dibuja el objeto con un ícono de línea morado (`Ilustraciones.kt`). Lista y cómo
 reemplazarlas: `docs/IMAGENES.md`. Siempre con `contentDescription` en español.
 Íconos de Material solo en controles (reproducir, pausar, agregar, estado).
 

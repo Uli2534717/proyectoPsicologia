@@ -15,34 +15,34 @@ import androidx.core.view.WindowCompat
 import com.upt.descansa.domain.model.ModoTema
 
 /**
- * Tema claro "Cartel sereno": lienzo blanco, texto carbón, morado como único color interactivo.
- * Todas las superficies son BLANCAS: sin grises de fondo ni elevación tonal.
+ * Tema de día "Cartel sereno": lienzo lila suave, texto carbón morado y morado profundo como único color interactivo.
+ * Todas las superficies son del mismo lila: sin grises de fondo ni elevación tonal.
  */
 private val EsquemaClaro = lightColorScheme(
     primary = MoradoProfundo,
-    onPrimary = BlancoLienzo,
-    primaryContainer = BlancoLienzo,
+    onPrimary = LilaLienzo,
+    primaryContainer = LilaLienzo,
     onPrimaryContainer = MoradoProfundo,
-    secondary = AzulCartel,
-    onSecondary = BlancoLienzo,
-    tertiary = TurquesaSereno,
-    onTertiary = GrisCarbon,
-    background = BlancoLienzo,
-    onBackground = GrisCarbon,
-    surface = BlancoLienzo,
-    onSurface = GrisCarbon,
-    surfaceVariant = BlancoLienzo,
-    onSurfaceVariant = GrisCarbon,
-    surfaceContainerLowest = BlancoLienzo,
-    surfaceContainerLow = BlancoLienzo,
-    surfaceContainer = BlancoLienzo,
-    surfaceContainerHigh = BlancoLienzo,
-    surfaceContainerHighest = BlancoLienzo,
-    surfaceTint = BlancoLienzo,
-    outline = GrisCarbon,
-    outlineVariant = GrisCarbon,
-    error = GrisCarbon,
-    onError = BlancoLienzo,
+    secondary = VioletaSecundario,
+    onSecondary = LilaLienzo,
+    tertiary = VioletaCartel,
+    onTertiary = CarbonMorado,
+    background = LilaLienzo,
+    onBackground = CarbonMorado,
+    surface = LilaLienzo,
+    onSurface = CarbonMorado,
+    surfaceVariant = LilaLienzo,
+    onSurfaceVariant = CarbonMorado,
+    surfaceContainerLowest = LilaLienzo,
+    surfaceContainerLow = LilaLienzo,
+    surfaceContainer = LilaLienzo,
+    surfaceContainerHigh = LilaLienzo,
+    surfaceContainerHighest = LilaLienzo,
+    surfaceTint = LilaLienzo,
+    outline = CarbonMorado,
+    outlineVariant = CarbonMorado,
+    error = CarbonMorado,
+    onError = LilaLienzo,
 )
 
 /**
@@ -54,9 +54,9 @@ private val EsquemaNocturno = darkColorScheme(
     onPrimary = MoradoNoche,
     primaryContainer = MoradoNoche,
     onPrimaryContainer = LavandaNoche,
-    secondary = AzulNoche,
+    secondary = RosaLilaNoche,
     onSecondary = MoradoNoche,
-    tertiary = TurquesaSereno,
+    tertiary = VioletaCartel,
     onTertiary = MoradoNoche,
     background = MoradoNoche,
     onBackground = TextoNoche,
@@ -72,7 +72,7 @@ private val EsquemaNocturno = darkColorScheme(
     surfaceTint = MoradoNoche,
     outline = TextoNoche,
     outlineVariant = TextoNoche,
-    error = AmarilloMantequilla,
+    error = RosaLilaNoche,
     onError = MoradoNoche,
 )
 
@@ -106,7 +106,9 @@ fun DescansaTheme(
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
-        LocalColoresCartel provides ColoresCartel(),
+        LocalColoresCartel provides ColoresCartel(
+            fondoIlustracion = if (nocturno) MoradoMarcoNoche else LilaMarco,
+        ),
         LocalEsNocturno provides nocturno,
     ) {
         MaterialTheme(

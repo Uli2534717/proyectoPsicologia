@@ -50,7 +50,7 @@ enum class GrupoMuscular(@StringRes val nombre: Int, @StringRes val instruccion:
 }
 
 /**
- * Pantalla 5 · Relajación muscular progresiva, paso 3 de 5 (turquesa: CALMA).
+ * Pantalla 5 · Relajación muscular progresiva, paso 3 de 5 (sección de noche: CALMA).
  *
  * "Siguiente" avanza de grupo; en el último grupo pasa al paso siguiente.
  * La cuenta regresiva muestra 00:05 fija: en la Fase 4 llegan los tiempos
@@ -68,7 +68,7 @@ fun RelajacionScreen(onAtras: () -> Unit, onSiguiente: () -> Unit) {
     PlantillaPaso(
         paso = 3,
         palabra = stringResource(R.string.palabra_relajacion),
-        colorPalabra = LocalColoresCartel.current.turquesa,
+        colorPalabra = LocalColoresCartel.current.noche,
         titulo = stringResource(R.string.relajacion_titulo),
         descripcion = stringResource(R.string.relajacion_subtitulo),
         imagen = R.drawable.img_relajacion_manta,

@@ -258,3 +258,31 @@ Se confirmarán con la documentación oficial vigente antes de implementarlas:
 blanco da ≈10:1 y la lavanda sobre el fondo nocturno ≈9:1 (mínimo pedido:
 4.5:1). Además, el morado recuerda la lavanda del prototipo original.
 Turquesa y amarillo siguen siendo SOLO decorativos (palabras gigantes y separadores).
+
+## D-22 · Dibujos de objetos en lugar de marcadores
+
+**Qué:** mientras no haya fotos reales, cada imagen muestra el **dibujo del
+objeto** con un ícono oficial de Material (línea), grande y en morado, sobre
+un marco lila (`Ilustraciones.kt`). Por ejemplo: luna, cama, notas, aire,
+persona meditando, paraguas, ondas, olas, bosque, despertador, taza y audífonos.
+
+**Por qué:** al equipo no le gustaron los marcadores sin forma. Los íconos
+oficiales se ven profesionales y ya están en el proyecto, así que no hay que
+descargar nada. `ImagenCartel` detecta si el recurso es el marcador `.xml` o
+una foto real (`.webp`): al poner la foto con el mismo nombre se muestra sola.
+Las descripciones de TalkBack describen el dibujo actual y hay que
+actualizarlas al poner la foto.
+
+## D-23 · Lila de día, morado de noche
+
+**Qué:** a pedido del equipo, la app es "más morada que nada":
+- Día: lienzo lila `#F6F2FF`, texto carbón morado `#2B2140`, interactivo
+  `#4B2E83` y secundario violeta `#7A5BC4` (antes azul).
+- Noche: fondo `#160F26`, interactivo lavanda `#B9A8FF` y secundario rosa lila `#E7B8F5`.
+- Palabras gigantes: violeta `#8B6FE8` (noche) y orquídea `#C7A6F2` (día),
+  en lugar de turquesa y amarillo. El zigzag es violeta.
+
+**Contraste:** texto ≈13.7:1, interactivo ≈9.4:1 y secundario ≈4.6:1 sobre el
+lila. De noche, la lavanda da ≈9:1. La orquídea de día da ≈1.9:1: es más visible
+que el amarillo anterior (1.2:1) y sigue siendo solo decorativa (ver D-20).
+Esta decisión reemplaza los colores de D-18 y D-21.

@@ -64,7 +64,7 @@ private val permisos = listOf(
 )
 
 /**
- * Pantalla 1 · Bienvenida (sección amarilla: DESCANSA).
+ * Pantalla 1 · Bienvenida (sección de día: DESCANSA).
  * Solo EXPLICA los permisos; cada uno se pide después, en su momento (sección 14).
  */
 @Composable
@@ -79,7 +79,7 @@ fun BienvenidaScreen(
 fun BienvenidaContenido(onComenzar: () -> Unit) {
     PantallaCartel(
         palabra = stringResource(R.string.palabra_bienvenida),
-        colorPalabra = LocalColoresCartel.current.amarillo,
+        colorPalabra = LocalColoresCartel.current.dia,
         titulo = stringResource(R.string.app_name),
         descripcion = stringResource(R.string.bienvenida_valor),
         tamano = TamanoCartel.XL,

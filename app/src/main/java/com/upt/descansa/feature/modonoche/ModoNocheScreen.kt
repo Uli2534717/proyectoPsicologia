@@ -77,7 +77,7 @@ class ModoNocheViewModel @Inject constructor(
 }
 
 /**
- * Pantalla 8 · Modo noche activo (turquesa: DESCANSA).
+ * Pantalla 8 · Modo noche activo (sección de noche: DESCANSA).
  * SIEMPRE en tema nocturno y con poco texto, para no iluminar el cuarto.
  */
 @Composable
@@ -125,7 +125,7 @@ fun ModoNocheContenido(ajustes: AjustesUsuario, respaldo: String?, onDetener: ()
         val esquema = MaterialTheme.colorScheme
         PantallaCartel(
             palabra = stringResource(R.string.palabra_modo_noche),
-            colorPalabra = LocalColoresCartel.current.turquesa,
+            colorPalabra = LocalColoresCartel.current.noche,
             titulo = stringResource(R.string.modo_noche_activo),
             imagen = R.drawable.img_modo_noche_lampara,
             descripcionImagen = stringResource(R.string.img_modo_noche_lampara),

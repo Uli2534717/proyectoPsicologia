@@ -61,7 +61,7 @@ private val pendientesEjemplo = listOf(
 )
 
 /**
- * Pantalla 9 · Resumen de la mañana (sección amarilla: ÁNIMO).
+ * Pantalla 9 · Resumen de la mañana (sección de día: ÁNIMO).
  *
  * Usa datos de EJEMPLO y lo dice en pantalla (nunca se presentan como reales).
  * En la Fase 6 se leerán de `noches`, `epocas` y `pendientes`, y la sensación
@@ -75,7 +75,7 @@ fun MananaScreen(onVolverAlInicio: () -> Unit) {
 
     PantallaCartel(
         palabra = stringResource(R.string.palabra_manana),
-        colorPalabra = LocalColoresCartel.current.amarillo,
+        colorPalabra = LocalColoresCartel.current.dia,
         titulo = stringResource(R.string.manana_saludo),
         descripcion = stringResource(R.string.manana_subtitulo),
         imagen = R.drawable.img_manana_taza,

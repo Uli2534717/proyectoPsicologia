@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- BlancoLienzo de core/designsystem/theme/Color.kt. Si cambias uno, cambia el otro. -->
-    <color name="fondo">#FFFFFFFF</color>
+    <!-- LilaLienzo de core/designsystem/theme/Color.kt. Si cambias uno, cambia el otro. -->
+    <color name="fondo">#FFF6F2FF</color>
 </resources>
