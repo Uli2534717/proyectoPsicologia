@@ -115,15 +115,57 @@ en pantalla.
 **Por qué:** son los mismos íconos de línea del prototipo y vienen como
 `ImageVector`, sin archivos extra. R8 elimina los que no se usan en la versión release.
 
+## D-11 · Alarma de respaldo (Fase 1)
+
+Revisado contra la documentación oficial de Android el 23 de noviembre de 2026
+(alarmas exactas, tipos de servicio en primer plano, cambios de Android 14 y 15).
+
+**Qué:**
+
+| Pieza | Elección |
+|---|---|
+| Programar | `AlarmManager.setAlarmClock()` en `AlarmSchedulerImpl` |
+| Permiso de alarmas exactas | `USE_EXACT_ALARM` (Android 13+) y `SCHEDULE_EXACT_ALARM` con `maxSdkVersion="32"` (Android 12) |
+| Sonar | `TimbreService`, servicio en primer plano de tipo `systemExempted\|mediaPlayback` |
+| Pantalla | `TimbreActivity` por notificación de pantalla completa (`USE_FULL_SCREEN_INTENT`) |
+| Reinicio | `ArranqueReceiver` (`BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`) reprograma la hora guardada en SharedPreferences |
+| Volumen | empieza al 10 % y sube durante 60 s; si el volumen de alarmas está en 0, se sube a la mitad |
+| Sin respuesta | se calla a los 10 min y la noche se cierra con motivo `HORA_LIMITE` |
+| Posponer | los minutos de Ajustes (5, 10 o 15); la noche sigue abierta |
+
+**Por qué:**
+- `setAlarmClock` es la única API que Android trata como despertador: no la
+  retrasa Doze ni el sistema. `USE_EXACT_ALARM` es la que la documentación
+  indica para apps de despertador y se concede al instalar. Play solo la acepta
+  en apps cuya función principal es de alarma o calendario: Descansa entra ahí.
+- El **sonido** no depende de ningún permiso que el usuario pueda negar: si niega
+  las notificaciones, no aparece la pantalla de timbre, pero el servicio suena
+  igual (probado en el emulador con API 37). La pantalla de modo noche avisa si
+  falta un permiso y lleva a Ajustes de Android.
+- `systemExempted` lo permite Android a las apps con permiso de alarmas exactas.
+  Se agregó `mediaPlayback` porque, sin él, Android 16+ registra que "silenciaría"
+  el audio de una app en segundo plano (`AudioHardening`); con él, ese aviso desaparece.
+- Desde Android 15 no se puede iniciar un servicio `mediaPlayback` desde
+  `BOOT_COMPLETED`; por eso el receptor de arranque solo reprograma la alarma.
+- Si el teléfono estuvo apagado a la hora de la alarma, al encender suena solo
+  si pasó menos de 1 hora (sonar horas después no tendría sentido).
+- La hora se guarda en SharedPreferences (no en DataStore) porque se lee desde un
+  BroadcastReceiver, donde conviene una lectura inmediata.
+
+**Limitaciones conocidas:**
+- Antes de desbloquear el teléfono por primera vez tras reiniciar, Android no
+  entrega `BOOT_COMPLETED`; la alarma se reprograma al desbloquear.
+- El botón "Probar alarma en 10 segundos" (modo desarrollador) reemplaza la
+  alarma que esté programada.
+- Si se abre la app durante la noche, empieza en Inicio y no en el modo noche.
+  Se resolverá en la Fase 2, cuando exista el servicio nocturno.
+
 ---
 
 ## Decisiones previstas para las siguientes fases
 
 Se confirmarán con la documentación oficial vigente antes de implementarlas:
 
-- **Fase 1:** permiso de alarmas exactas. Una app de despertador puede declarar
-  `USE_EXACT_ALARM`; se verificará contra targetSdk 37 y la política de Play.
-  También `USE_FULL_SCREEN_INTENT` para la pantalla de timbre.
 - **Fase 2:** tipo de servicio en primer plano para el sensor (`health` o
   `specialUse`) y sus permisos. Medida de actividad: desviación estándar de
   |a|/g por minuto.

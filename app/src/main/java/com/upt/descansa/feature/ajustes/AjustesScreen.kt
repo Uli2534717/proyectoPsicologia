@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.upt.descansa.R
+import com.upt.descansa.core.designsystem.BotonSecundario
 import com.upt.descansa.core.designsystem.EtiquetaSeccion
 import com.upt.descansa.core.designsystem.FilaChips
 import com.upt.descansa.core.designsystem.TarjetaDescansa
@@ -42,6 +43,7 @@ import com.upt.descansa.core.theme.Turquesa
 import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.Sensibilidad
 import com.upt.descansa.domain.repository.AjustesRepository
+import com.upt.descansa.domain.repository.ProgramadorAlarma
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -54,6 +56,7 @@ import javax.inject.Inject
 class AjustesViewModel @Inject constructor(
     observarAjustes: ObservarAjustesUseCase,
     private val repositorio: AjustesRepository,
+    private val programador: ProgramadorAlarma,
 ) : ViewModel() {
 
     val ajustes: StateFlow<AjustesUsuario> =
@@ -61,6 +64,14 @@ class AjustesViewModel @Inject constructor(
 
     fun alCambiar(cambio: (AjustesUsuario) -> AjustesUsuario) {
         viewModelScope.launch { repositorio.actualizar(cambio) }
+    }
+
+    /**
+     * Modo desarrollador: hace sonar la alarma en 10 s para probarla sin esperar
+     * a la mañana (bloquea el teléfono después de tocarlo). Reemplaza la alarma programada.
+     */
+    fun alProbarAlarma() {
+        programador.programar(System.currentTimeMillis() + 10_000L)
     }
 }
 
@@ -79,7 +90,12 @@ fun AjustesScreen(
     viewModel: AjustesViewModel = hiltViewModel(),
 ) {
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
-    AjustesContenido(ajustes = ajustes, onAtras = onAtras, onCambiar = viewModel::alCambiar)
+    AjustesContenido(
+        ajustes = ajustes,
+        onAtras = onAtras,
+        onCambiar = viewModel::alCambiar,
+        onProbarAlarma = viewModel::alProbarAlarma,
+    )
 }
 
 @Composable
@@ -87,6 +103,7 @@ fun AjustesContenido(
     ajustes: AjustesUsuario,
     onAtras: () -> Unit,
     onCambiar: ((AjustesUsuario) -> AjustesUsuario) -> Unit,
+    onProbarAlarma: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -145,6 +162,10 @@ fun AjustesContenido(
             activado = ajustes.modoDesarrollador,
             onCambiar = { v -> onCambiar { it.copy(modoDesarrollador = v) } },
         )
+        if (ajustes.modoDesarrollador) {
+            BotonSecundario(texto = stringResource(R.string.ajustes_probar_alarma), onClick = onProbarAlarma)
+            Text(stringResource(R.string.ajustes_probar_alarma_detalle), style = MaterialTheme.typography.bodySmall, color = TextoAtenuado)
+        }
         // Aviso permanente (sección 14).
         Text(stringResource(R.string.aviso_no_medico), style = MaterialTheme.typography.bodySmall, color = TextoAtenuado)
     }

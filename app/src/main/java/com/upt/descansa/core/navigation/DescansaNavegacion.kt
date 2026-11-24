@@ -19,6 +19,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,14 +71,26 @@ private fun NavDestination?.muestraBarra(): Boolean =
  * y TODO el flujo de la app se lee en este único archivo.
  *
  * @param bienvenidaCompletada decide si la app abre en Bienvenida o en Inicio.
+ * @param abrirManana true cuando se acaba de apagar la alarma: se abre el resumen.
+ * @param onMananaAbierta avisa que ya se navegó, para no repetirlo.
  */
 @Composable
 fun DescansaNavegacion(
     bienvenidaCompletada: Boolean,
+    abrirManana: Boolean = false,
+    onMananaAbierta: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val entradaActual by navController.currentBackStackEntryAsState()
     val destinoActual = entradaActual?.destination
+
+    // Al apagar la alarma: Inicio → Mañana (también quita el modo noche de la pila).
+    LaunchedEffect(abrirManana) {
+        if (abrirManana) {
+            navController.navigate(RutaManana) { popUpTo(RutaInicio) }
+            onMananaAbierta()
+        }
+    }
 
     Scaffold(
         // En modo noche, el fondo detrás de las barras del sistema también va casi negro.

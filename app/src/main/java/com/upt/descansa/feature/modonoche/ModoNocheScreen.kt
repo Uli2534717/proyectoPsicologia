@@ -28,21 +28,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.upt.descansa.R
 import com.upt.descansa.core.designsystem.EtiquetaSeccion
 import com.upt.descansa.core.designsystem.FormaPildora
+import com.upt.descansa.core.theme.Advertencia
 import com.upt.descansa.core.theme.Borde
 import com.upt.descansa.core.theme.BordeTenue
 import com.upt.descansa.core.theme.DescansaTheme
@@ -57,28 +61,43 @@ import com.upt.descansa.core.util.inicioVentana
 import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.FuenteDatos
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
+import com.upt.descansa.domain.usecase.noche.DetenerModoNocheUseCase
+import com.upt.descansa.sistema.alarma.alarmaConTodosLosPermisos
+import com.upt.descansa.sistema.alarma.intentAjustesAlarma
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 import javax.inject.Inject
 
-/** Lee los ajustes con los que se activó la noche, para mostrarlos. */
+/** Lee los ajustes con los que se activó la noche y permite detenerla. */
 @HiltViewModel
-class ModoNocheViewModel @Inject constructor(observarAjustes: ObservarAjustesUseCase) : ViewModel() {
+class ModoNocheViewModel @Inject constructor(
+    observarAjustes: ObservarAjustesUseCase,
+    private val detenerModoNoche: DetenerModoNocheUseCase,
+) : ViewModel() {
     val ajustes: StateFlow<AjustesUsuario> =
         observarAjustes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AjustesUsuario())
+
+    /** Cancela la alarma de respaldo, cierra la noche y luego llama a [onListo]. */
+    fun alDetener(onListo: () -> Unit) {
+        viewModelScope.launch {
+            detenerModoNoche()
+            onListo()
+        }
+    }
 }
 
 /**
  * Pantalla 8 · Modo noche activo.
  *
  * Fondo casi negro y poco texto para no iluminar el cuarto.
- * FASE 0: muestra lo configurado y "Detener" (con confirmación) lleva al
- * resumen de la mañana. En las Fases 1–3 esta pantalla reflejará el estado
- * real del servicio nocturno, la alarma de respaldo y No molestar.
+ * FASE 1: la alarma de respaldo ya está programada de verdad; "Detener" la
+ * cancela. Si falta un permiso para que la alarma se vea o sea exacta, se avisa.
+ * En las Fases 2–3 reflejará el servicio nocturno y No molestar.
  */
 @Composable
 fun ModoNocheScreen(
@@ -86,11 +105,29 @@ fun ModoNocheScreen(
     viewModel: ModoNocheViewModel = hiltViewModel(),
 ) {
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
-    ModoNocheContenido(ajustes = ajustes, onDetener = onDetenido)
+    val contexto = LocalContext.current
+    // Se revisa cada vez que la pantalla vuelve a verse: el usuario pudo ir a
+    // Ajustes de Android a dar el permiso y regresar.
+    var faltanPermisos by remember { mutableStateOf(false) }
+    LifecycleResumeEffect(Unit) {
+        faltanPermisos = !alarmaConTodosLosPermisos(contexto)
+        onPauseOrDispose { }
+    }
+    ModoNocheContenido(
+        ajustes = ajustes,
+        faltanPermisos = faltanPermisos,
+        onAbrirPermisos = { contexto.startActivity(intentAjustesAlarma(contexto)) },
+        onDetener = { viewModel.alDetener(onDetenido) },
+    )
 }
 
 @Composable
-fun ModoNocheContenido(ajustes: AjustesUsuario, onDetener: () -> Unit) {
+fun ModoNocheContenido(
+    ajustes: AjustesUsuario,
+    onDetener: () -> Unit,
+    faltanPermisos: Boolean = false,
+    onAbrirPermisos: () -> Unit = {},
+) {
     var confirmando by rememberSaveable { mutableStateOf(false) }
     val horaLimite = formatearHora(ajustes.horaLimiteMinutos)
     val desde = formatearHora(inicioVentana(ajustes.horaLimiteMinutos, ajustes.ventanaMinutos))
@@ -137,6 +174,19 @@ fun ModoNocheContenido(ajustes: AjustesUsuario, onDetener: () -> Unit) {
                 if (ajustes.fuente == FuenteDatos.SMARTWATCH) R.string.alarma_fuente_reloj else R.string.alarma_fuente_telefono,
             )
             LineaActivada(stringResource(R.string.modo_noche_fuente, fuente.lowercase()))
+        }
+        if (faltanPermisos) {
+            // Honestidad: si la alarma no se verá o puede retrasarse, se dice y se ofrece arreglarlo.
+            Spacer(Modifier.height(16.dp))
+            Text(
+                stringResource(R.string.modo_noche_falta_permiso),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Advertencia,
+                textAlign = TextAlign.Center,
+            )
+            TextButton(onClick = onAbrirPermisos, modifier = Modifier.heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.modo_noche_dar_permiso), color = Lavanda)
+            }
         }
         Spacer(Modifier.weight(1f))
         Text(

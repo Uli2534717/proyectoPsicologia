@@ -1,5 +1,6 @@
 package com.upt.descansa
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,23 +9,30 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.upt.descansa.core.navigation.DescansaNavegacion
 import com.upt.descansa.core.theme.DescansaTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * Única Activity de la interfaz: todas las pantallas son composables que
- * Navigation Compose cambia dentro de ella. (La pantalla de timbre de la
- * alarma será otra Activity en la Fase 1, porque debe abrirse sobre el bloqueo.)
+ * Activity principal: todas las pantallas son composables que Navigation
+ * Compose cambia dentro de ella. La pantalla de timbre es otra Activity
+ * (`sistema/alarma/TimbreActivity`) porque debe abrirse sobre el bloqueo.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    /** true cuando la pantalla de timbre pidió abrir el resumen de la mañana. */
+    private var abrirManana by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Solo en la primera creación: si se rota la pantalla no se vuelve a abrir.
+        if (savedInstanceState == null) leerIntent(intent)
         // App siempre oscura: íconos claros en las barras del sistema.
         val barras = SystemBarStyle.dark(Color.TRANSPARENT)
         enableEdgeToEdge(statusBarStyle = barras, navigationBarStyle = barras)
@@ -34,8 +42,26 @@ class MainActivity : ComponentActivity() {
                 val arranque by viewModel.arranque.collectAsStateWithLifecycle()
                 // Mientras se leen los ajustes se ve solo el fondo de la ventana (oscuro).
                 val listo = arranque as? EstadoArranque.Listo ?: return@DescansaTheme
-                DescansaNavegacion(bienvenidaCompletada = listo.bienvenidaCompletada)
+                DescansaNavegacion(
+                    bienvenidaCompletada = listo.bienvenidaCompletada,
+                    abrirManana = abrirManana,
+                    onMananaAbierta = { abrirManana = false },
+                )
             }
         }
+    }
+
+    /** `singleTop`: si la app ya estaba abierta, el Intent nuevo llega aquí. */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        leerIntent(intent)
+    }
+
+    private fun leerIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_ABRIR_MANANA, false) == true) abrirManana = true
+    }
+
+    companion object {
+        const val EXTRA_ABRIR_MANANA = "abrir_manana"
     }
 }

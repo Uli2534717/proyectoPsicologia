@@ -29,11 +29,36 @@ distintas** (sección 15 del documento).
 - [ ] Con TalkBack activado, los botones de solo ícono se leen con su nombre.
 - [ ] Con letra grande (Ajustes de Android → Tamaño de fuente al máximo) nada se corta.
 
+## Fase 1 · Alarma de respaldo (teléfono real)
+
+Atajo: en Ajustes, activa **Modo desarrollador** y toca **Probar alarma en 10
+segundos**; después bloquea el teléfono.
+
+En el emulador (Pixel 9, API 37) ya se comprobó: la alarma de prueba suena con el
+teléfono bloqueado, aparece la pantalla de timbre, "Apagar" abre el resumen, y
+tras reiniciar la alarma de las 07:00 se vuelve a programar.
+
+- [ ] Paso 5 → "Activar modo noche": en Android 13+ pide el permiso de notificaciones.
+- [ ] Aparece el ícono de alarma ⏰ en la barra de estado (alarma programada).
+- [ ] Con el teléfono **bloqueado**, la alarma enciende la pantalla y muestra "Es hora de despertar".
+- [ ] El volumen empieza bajo y sube durante ~1 minuto; el teléfono vibra.
+- [ ] Con el volumen de alarmas en 0, aun así se escucha.
+- [ ] "Apagar" detiene el sonido y abre el resumen de la mañana.
+- [ ] "Posponer" la vuelve a hacer sonar tras los minutos elegidos en Ajustes.
+- [ ] Los botones Apagar/Posponer de la **notificación** también funcionan.
+- [ ] **Negando** las notificaciones: la alarma suena igual, y el modo noche muestra el aviso "falta un permiso".
+- [ ] Con No molestar del sistema activado, la alarma suena.
+- [ ] **Reinicio:** activar el modo noche, reiniciar, desbloquear: la alarma sigue programada.
+- [ ] Cerrar la app deslizándola desde "recientes": la alarma suena igual.
+- [ ] "Detener" en el modo noche cancela la alarma (desaparece el ⏰).
+- [ ] Si nadie la apaga, se calla sola a los 10 minutos.
+
+> "Forzar detención" desde Ajustes de Android **cancela todas las alarmas de la
+> app**: así funciona Android y ninguna app lo puede evitar. Por eso no se
+> incluye como prueba.
+
 ## Fases siguientes (se completan en su fase)
 
-- [ ] Alarma de respaldo con el teléfono bloqueado.
-- [ ] Alarma de respaldo después de reiniciar el teléfono.
-- [ ] Alarma de respaldo con la app cerrada a la fuerza.
 - [ ] Alarma inteligente con el simulador (noche inquieta y noche tranquila).
 - [ ] Una noche real de prueba.
 - [ ] No molestar se activa y se restaura al detener.

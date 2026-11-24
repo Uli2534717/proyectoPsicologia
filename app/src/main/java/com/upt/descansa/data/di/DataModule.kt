@@ -13,7 +13,11 @@ import com.upt.descansa.data.local.dao.EstadisticaSonidoDao
 import com.upt.descansa.data.local.dao.NocheDao
 import com.upt.descansa.data.local.dao.PendienteDao
 import com.upt.descansa.data.prefs.AjustesRepositoryImpl
+import com.upt.descansa.data.repository.NocheRepositoryImpl
 import com.upt.descansa.domain.repository.AjustesRepository
+import com.upt.descansa.domain.repository.NocheRepository
+import com.upt.descansa.domain.repository.ProgramadorAlarma
+import com.upt.descansa.sistema.alarma.AlarmSchedulerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -55,4 +59,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun vincularAjustesRepository(impl: AjustesRepositoryImpl): AjustesRepository
+
+    @Binds
+    abstract fun vincularNocheRepository(impl: NocheRepositoryImpl): NocheRepository
+
+    @Binds
+    abstract fun vincularProgramadorAlarma(impl: AlarmSchedulerImpl): ProgramadorAlarma
 }

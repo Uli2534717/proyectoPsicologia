@@ -2,6 +2,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ===== Alarma de respaldo (Fase 1). Ver docs/DECISIONES.md, D-11. ===== -->
+    <!--
+        Alarmas exactas. USE_EXACT_ALARM (Android 13+) es para apps de despertador:
+        se concede al instalar y el usuario no la puede quitar. En Android 12 y 12L
+        esa no existe y se usa SCHEDULE_EXACT_ALARM (por eso maxSdkVersion="32").
+    -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!-- Volver a programar la alarma después de reiniciar el teléfono. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Servicio en primer plano que hace sonar la alarma. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Notificación de la alarma y pantalla de timbre sobre el bloqueo. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <!-- Mantener la CPU despierta y vibrar mientras suena. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!--
         android:name: clase Application con @HiltAndroidApp (activa Hilt).
         android:allowBackup="false": por privacidad, los datos (noches,
@@ -21,6 +44,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Descansa"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -29,6 +53,44 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+            Pantalla de timbre: tarea propia (taskAffinity vacío) para no mezclarse
+            con la app, y fuera de "recientes" porque solo tiene sentido mientras suena.
+        -->
+        <activity
+            android:name=".sistema.alarma.TimbreActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Descansa"
+            android:turnScreenOn="true" />
+
+        <service
+            android:name=".sistema.alarma.TimbreService"
+            android:exported="false"
+            android:foregroundServiceType="systemExempted|mediaPlayback" />
+
+        <!-- Lo llama AlarmManager a la hora de la alarma (no lo pueden llamar otras apps). -->
+        <receiver
+            android:name=".sistema.alarma.AlarmaReceiver"
+            android:exported="false" />
+
+        <!--
+            exported="true" porque estos avisos los manda el sistema; son "protegidos",
+            así que ninguna otra app puede enviarlos.
+        -->
+        <receiver
+            android:name=".sistema.alarma.ArranqueReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
