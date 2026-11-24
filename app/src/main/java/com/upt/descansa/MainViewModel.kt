@@ -2,12 +2,14 @@ package com.upt.descansa
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upt.descansa.domain.model.ModoTema
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -21,8 +23,10 @@ sealed interface EstadoArranque {
 }
 
 /**
- * Decide con qué pantalla abre la app. Se lee UNA sola vez (con `first()`):
- * si se observara siempre, al pulsar "Comenzar" el NavHost se reconstruiría.
+ * Decide con qué pantalla abre la app y qué tema usa.
+ * La pantalla inicial se lee UNA sola vez (con `first()`): si se observara
+ * siempre, al pulsar "Comenzar" el NavHost se reconstruiría. El tema, en
+ * cambio, sí se observa: al cambiarlo en Ajustes, la app cambia al momento.
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -32,4 +36,8 @@ class MainViewModel @Inject constructor(
     val arranque: StateFlow<EstadoArranque> = flow<EstadoArranque> {
         emit(EstadoArranque.Listo(observarAjustes().first().bienvenidaCompletada))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, EstadoArranque.Cargando)
+
+    val modoTema: StateFlow<ModoTema> = observarAjustes()
+        .map { it.modoTema }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ModoTema.AUTOMATICO)
 }

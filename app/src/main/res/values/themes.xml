@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Tema "nativo" de la ventana. Compose dibuja todo lo demás, pero este color
-        se ve un instante al abrir la app: es el fondo del prototipo para que no
-        haya un destello blanco de noche.
+        Tema "nativo" de la ventana. Compose dibuja todo lo demás, pero este
+        color se ve un instante al abrir la app. Sigue el modo del teléfono:
+        lienzo blanco de día (values/) y verde noche de noche (values-night/),
+        para que no haya destellos.
     -->
-    <style name="Theme.Descansa" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Descansa" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/fondo</item>
     </style>
 </resources>

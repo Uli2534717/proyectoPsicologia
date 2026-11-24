@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    IMAGEN DE PRUEBA (marcador). Reemplazar por la fotografía definitiva:
+    un objeto sobre fondo blanco. Ver docs/IMAGENES.md.
+    Para reemplazarla: poner un archivo .webp con ESTE MISMO NOMBRE en esta
+    carpeta y borrar este .xml. El código no cambia.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Fondo blanco cálido, como papel fotográfico -->
+    <path android:fillColor="#FFF7F5F0" android:pathData="M0,0 L100,0 L100,100 L0,100 Z" />
+    <!-- Superficie donde se apoya el objeto -->
+    <path android:fillColor="#00000000" android:strokeColor="#FF333333" android:strokeWidth="1.5"
+        android:pathData="M15,78 L85,78" />
+    <!-- Objeto genérico de contorno -->
+    <path android:fillColor="#00000000" android:strokeColor="#FF333333" android:strokeWidth="1.5"
+        android:pathData="M32,78 L32,52 L68,52 L68,78" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF333333" android:strokeWidth="1.5"
+        android:pathData="M50,22 A12,12 0 1,1 49.99,22 Z" />
+</vector>

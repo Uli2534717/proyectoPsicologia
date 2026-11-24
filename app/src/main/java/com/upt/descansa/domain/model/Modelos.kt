@@ -45,6 +45,14 @@ enum class MarcaEpoca {
     TOMADO,
 }
 
+/** Tema visual elegido en Ajustes. */
+enum class ModoTema {
+    /** Sigue el modo claro/oscuro del teléfono (por defecto). */
+    AUTOMATICO,
+    CLARO,
+    OSCURO,
+}
+
 /**
  * Ajustes del usuario (se guardan con DataStore).
  *
@@ -64,6 +72,7 @@ data class AjustesUsuario(
     val bienvenidaCompletada: Boolean = false,
     val avisoSaludAceptado: Boolean = false,
     val modoDesarrollador: Boolean = false,
+    val modoTema: ModoTema = ModoTema.AUTOMATICO,
 )
 
 /** Datos de la tarjeta "Tu última noche" en Inicio. Horas en formato local "HH:mm". */

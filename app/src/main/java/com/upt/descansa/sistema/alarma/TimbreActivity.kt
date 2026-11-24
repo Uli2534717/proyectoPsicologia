@@ -10,18 +10,9 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.WbTwilight
-import androidx.compose.material3.Icon
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,21 +21,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.upt.descansa.MainActivity
 import com.upt.descansa.R
-import com.upt.descansa.core.designsystem.BotonPrincipal
-import com.upt.descansa.core.designsystem.BotonSecundario
-import com.upt.descansa.core.theme.DescansaTheme
-import com.upt.descansa.core.theme.Fondo
-import com.upt.descansa.core.theme.Texto
-import com.upt.descansa.core.theme.TextoAtenuado
-import com.upt.descansa.core.theme.Turquesa
+import com.upt.descansa.core.designsystem.components.BotonPildora
+import com.upt.descansa.core.designsystem.components.BotonSecundario
+import com.upt.descansa.core.designsystem.components.PantallaCartel
+import com.upt.descansa.core.designsystem.motion.animacionesReducidas
+import com.upt.descansa.core.designsystem.theme.LocalColoresCartel
+import com.upt.descansa.core.designsystem.theme.TemaNocturno
+import com.upt.descansa.core.designsystem.theme.TipoCartel
 import com.upt.descansa.core.util.formatearHora
 import kotlinx.coroutines.delay
 import java.time.LocalTime
@@ -72,7 +64,7 @@ class TimbreActivity : ComponentActivity() {
         val posponerMinutos = intent.getIntExtra(EXTRA_POSPONER, 5)
 
         setContent {
-            DescansaTheme {
+            TemaNocturno {
                 val sonando by TimbreService.sonando.collectAsStateWithLifecycle()
                 // Si la alarma se detuvo desde la notificación, esta pantalla se cierra sola.
                 LaunchedEffect(sonando) { if (!sonando) finishAndRemoveTask() }
@@ -114,6 +106,10 @@ class TimbreActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Contenido de la pantalla de timbre (turquesa: DESPIERTA), siempre en tema nocturno.
+ * La palabra DESPIERTA crece de 0.9 a 1.0 en 30 s, al mismo ritmo que el volumen.
+ */
 @Composable
 private fun TimbreContenido(posponerMinutos: Int, onDetener: () -> Unit, onPosponer: () -> Unit) {
     var minutoActual by remember { mutableIntStateOf(LocalTime.now().let { it.hour * 60 + it.minute }) }
@@ -124,31 +120,40 @@ private fun TimbreContenido(posponerMinutos: Int, onDetener: () -> Unit, onPospo
             delay(1_000)
         }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Fondo)
-            .safeDrawingPadding()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    val reducidas = animacionesReducidas()
+    val escala = remember { Animatable(if (reducidas) 1f else 0.9f) }
+    // 30 s = la misma rampa que el volumen de ReproductorAlarma.
+    LaunchedEffect(Unit) { escala.animateTo(1f, tween(30_000, easing = LinearEasing)) }
+
+    PantallaCartel(
+        palabra = stringResource(R.string.palabra_alarma),
+        colorPalabra = LocalColoresCartel.current.turquesa,
+        titulo = stringResource(R.string.timbre_titulo),
+        descripcion = stringResource(R.string.timbre_subtitulo),
+        imagen = R.drawable.img_alarma_despertador,
+        descripcionImagen = stringResource(R.string.img_alarma_despertador),
+        nocturna = true,
+        // Crece desde la esquina izquierda, como si el cartel se acercara.
+        modificadorPalabra = Modifier.graphicsLayer {
+            scaleX = escala.value
+            scaleY = escala.value
+            transformOrigin = TransformOrigin(0f, 0.5f)
+        },
+        accionPrincipal = {
+            BotonSecundario(
+                stringResource(R.string.timbre_posponer, posponerMinutos),
+                onClick = onPosponer,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            BotonPildora(stringResource(R.string.timbre_detener), onClick = onDetener)
+        },
     ) {
-        Spacer(Modifier.weight(1f))
-        Icon(Icons.Outlined.WbTwilight, contentDescription = null, tint = Turquesa, modifier = Modifier.size(56.dp))
-        Text(formatearHora(minutoActual), style = MaterialTheme.typography.displayLarge, color = Texto)
-        Text(stringResource(R.string.timbre_titulo), style = MaterialTheme.typography.headlineMedium, color = Texto)
-        Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.timbre_subtitulo), style = MaterialTheme.typography.bodyLarge, color = TextoAtenuado)
-        Spacer(Modifier.weight(1f))
-        BotonSecundario(texto = stringResource(R.string.timbre_posponer, posponerMinutos), onClick = onPosponer)
-        Spacer(Modifier.height(16.dp))
-        BotonPrincipal(texto = stringResource(R.string.timbre_detener), onClick = onDetener)
-        Spacer(Modifier.height(16.dp))
+        Text(formatearHora(minutoActual), style = TipoCartel.hora, color = MaterialTheme.colorScheme.onBackground)
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF0F1B2D, heightDp = 800)
+@Preview(showBackground = true, heightDp = 800)
 @Composable
 private fun TimbrePreview() {
-    DescansaTheme { TimbreContenido(posponerMinutos = 5, onDetener = {}, onPosponer = {}) }
+    TemaNocturno { TimbreContenido(posponerMinutos = 5, onDetener = {}, onPosponer = {}) }
 }

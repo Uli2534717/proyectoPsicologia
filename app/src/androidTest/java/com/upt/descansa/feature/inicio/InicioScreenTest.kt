@@ -8,7 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.upt.descansa.R
 import com.upt.descansa.core.navigation.RutaApp
 import com.upt.descansa.core.navigation.RutaRespiracion
-import com.upt.descansa.core.theme.DescansaTheme
+import com.upt.descansa.core.designsystem.theme.DescansaTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule

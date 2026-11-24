@@ -3,17 +3,12 @@ package com.upt.descansa.feature.noche.alarma
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import com.upt.descansa.core.theme.Advertencia
-import com.upt.descansa.sistema.Permisos
-import kotlinx.coroutines.launch
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.PhoneAndroid
@@ -22,47 +17,50 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.unit.dp
 import com.upt.descansa.R
-import com.upt.descansa.core.designsystem.AvisoTarjeta
-import com.upt.descansa.core.designsystem.EtiquetaSeccion
-import com.upt.descansa.core.designsystem.FilaChips
-import com.upt.descansa.core.designsystem.PlantillaPaso
-import com.upt.descansa.core.designsystem.TarjetaDescansa
-import com.upt.descansa.core.theme.DescansaTheme
-import com.upt.descansa.core.theme.Fondo
-import com.upt.descansa.core.theme.Lavanda
-import com.upt.descansa.core.theme.Texto
-import com.upt.descansa.core.theme.TextoAtenuado
-import com.upt.descansa.core.theme.Turquesa
+import com.upt.descansa.core.designsystem.components.AdornoEtiqueta
+import com.upt.descansa.core.designsystem.components.AvisoCartel
+import com.upt.descansa.core.designsystem.components.EtiquetaCategoria
+import com.upt.descansa.core.designsystem.components.FilaInterruptor
+import com.upt.descansa.core.designsystem.components.PlantillaPaso
+import com.upt.descansa.core.designsystem.components.SelectorOpciones
+import com.upt.descansa.core.designsystem.components.TarjetaCartel
+import com.upt.descansa.core.designsystem.theme.Bordes
+import com.upt.descansa.core.designsystem.theme.DescansaTheme
+import com.upt.descansa.core.designsystem.theme.Espacio
+import com.upt.descansa.core.designsystem.theme.Formas
+import com.upt.descansa.core.designsystem.theme.LocalColoresCartel
+import com.upt.descansa.core.designsystem.theme.TipoCartel
 import com.upt.descansa.core.util.formatearHora
 import com.upt.descansa.core.util.inicioVentana
 import com.upt.descansa.domain.model.FuenteDatos
+import com.upt.descansa.sistema.Permisos
+import kotlinx.coroutines.launch
 
 /** Ventanas de despertar permitidas (sección 6.1). */
 private val ventanas = listOf(15, 20, 30)
 
-/** Pantalla 7 · Alarma inteligente (paso 5 de 5). */
+/** Pantalla 7 · Alarma inteligente, paso 5 de 5 (sección turquesa: DESPIERTA). */
 @Composable
 fun AlarmaScreen(
     onAtras: () -> Unit,
@@ -139,6 +137,7 @@ fun AlarmaScreen(
 
 private enum class DialogoPermiso { NINGUNO, NOTIFICACIONES, PANTALLA_COMPLETA }
 
+/** Diálogo "Cartel sereno": sin elevación ni sombra, con contorno. */
 @Composable
 private fun DialogoExplicacion(
     titulo: String,
@@ -149,10 +148,15 @@ private fun DialogoExplicacion(
 ) {
     AlertDialog(
         onDismissRequest = onRechazar,
-        title = { Text(titulo) },
-        text = { Text(texto) },
-        confirmButton = { TextButton(onClick = onAceptar) { Text(textoAceptar) } },
-        dismissButton = { TextButton(onClick = onRechazar) { Text(stringResource(R.string.permiso_ahora_no)) } },
+        title = { Text(titulo, style = TipoCartel.subtitulo.copy(fontSize = TipoCartel.titulo.fontSize)) },
+        text = { Text(texto, style = TipoCartel.cuerpo) },
+        confirmButton = { TextButton(onClick = onAceptar) { Text(textoAceptar.uppercase(), style = TipoCartel.etiqueta) } },
+        dismissButton = {
+            TextButton(onClick = onRechazar) { Text(stringResource(R.string.permiso_ahora_no).uppercase(), style = TipoCartel.etiqueta) }
+        },
+        tonalElevation = 0.dp,
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = Modifier.border(Bordes.normal, MaterialTheme.colorScheme.outline, Formas.tarjeta),
     )
 }
 
@@ -171,39 +175,39 @@ fun AlarmaContenido(
     var eligiendoHora by rememberSaveable { mutableStateOf(false) }
     val horaLimite = formatearHora(estado.horaLimiteMinutos)
     val desde = formatearHora(inicioVentana(estado.horaLimiteMinutos, estado.ventanaMinutos))
+    val esquema = MaterialTheme.colorScheme
 
     PlantillaPaso(
         paso = 5,
+        palabra = stringResource(R.string.palabra_alarma),
+        colorPalabra = LocalColoresCartel.current.turquesa,
         titulo = stringResource(R.string.alarma_titulo),
+        imagen = R.drawable.img_alarma_despertador,
+        descripcionImagen = stringResource(R.string.img_alarma_despertador),
         textoBoton = stringResource(R.string.alarma_activar),
         onAtras = onAtras,
         onBoton = onActivarModoNoche,
-        // El último paso no se omite: es el que activa la noche.
+        // El último paso no se omite: es el que activa la noche (D-07).
         onOmitir = null,
     ) {
-        // Tarjeta de hora límite: al tocarla se abre el selector de hora.
-        TarjetaDescansa(modifier = Modifier.fillMaxWidth(), onClick = { eligiendoHora = true }) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    EtiquetaSeccion(stringResource(R.string.alarma_hora_limite))
-                    Text(stringResource(R.string.alarma_puede_sonar_desde, desde), style = MaterialTheme.typography.bodyMedium, color = TextoAtenuado)
-                }
-                Text(horaLimite, style = MaterialTheme.typography.displaySmall, color = Texto)
-            }
+        // Hora límite: al tocarla se abre el selector de hora.
+        TarjetaCartel(Modifier.fillMaxWidth(), onClick = { eligiendoHora = true }) {
+            EtiquetaCategoria(stringResource(R.string.alarma_hora_limite), adorno = AdornoEtiqueta.CHEVRON)
+            Text(horaLimite, style = TipoCartel.hora, color = esquema.onBackground)
+            Text(stringResource(R.string.alarma_puede_sonar_desde, desde), style = TipoCartel.cuerpo, color = esquema.onBackground)
         }
 
-        Text(stringResource(R.string.alarma_ventana), style = MaterialTheme.typography.labelMedium, color = TextoAtenuado)
-        FilaChips(
+        EtiquetaCategoria(stringResource(R.string.alarma_ventana))
+        SelectorOpciones(
             opciones = ventanas,
             seleccionada = estado.ventanaMinutos,
             etiqueta = { stringResource(R.string.minutos_corto, it) },
             onSeleccionar = onCambiarVentana,
         )
 
-        Text(stringResource(R.string.alarma_fuente), style = MaterialTheme.typography.labelMedium, color = TextoAtenuado)
+        EtiquetaCategoria(stringResource(R.string.alarma_fuente))
         OpcionFuente(
             icono = Icons.Outlined.PhoneAndroid,
-            colorIcono = Lavanda,
             titulo = stringResource(R.string.alarma_fuente_telefono),
             detalle = stringResource(R.string.alarma_fuente_telefono_detalle),
             seleccionada = estado.fuente == FuenteDatos.ACELEROMETRO_TELEFONO,
@@ -211,7 +215,6 @@ fun AlarmaContenido(
         )
         OpcionFuente(
             icono = Icons.Outlined.Watch,
-            colorIcono = Turquesa,
             titulo = stringResource(R.string.alarma_fuente_reloj),
             detalle = stringResource(R.string.alarma_fuente_reloj_detalle),
             seleccionada = estado.fuente == FuenteDatos.SMARTWATCH,
@@ -219,29 +222,15 @@ fun AlarmaContenido(
         )
 
         // Principio "la alarma nunca falla": siempre se avisa del respaldo.
-        AvisoTarjeta(icono = Icons.Outlined.ErrorOutline, texto = stringResource(R.string.alarma_respaldo))
-        if (error != null) {
-            AvisoTarjeta(icono = Icons.Outlined.ErrorOutline, texto = error, colorIcono = Advertencia)
-        }
+        AvisoCartel(stringResource(R.string.alarma_respaldo), icono = Icons.Outlined.ErrorOutline)
+        if (error != null) AvisoCartel(error, icono = Icons.Outlined.ErrorOutline)
 
-        TarjetaDescansa(
-            modifier = Modifier
-                .fillMaxWidth()
-                // Toda la tarjeta cambia el interruptor (área táctil grande).
-                .toggleable(value = estado.noMolestar, role = Role.Switch, onValueChange = onCambiarNoMolestar),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.permiso_no_molestar), style = MaterialTheme.typography.titleMedium, color = Texto)
-                    Text(stringResource(R.string.alarma_no_molestar_detalle), style = MaterialTheme.typography.bodyMedium, color = TextoAtenuado)
-                }
-                Switch(
-                    checked = estado.noMolestar,
-                    onCheckedChange = null,
-                    colors = SwitchDefaults.colors(checkedTrackColor = Turquesa, checkedThumbColor = Fondo),
-                )
-            }
-        }
+        FilaInterruptor(
+            titulo = stringResource(R.string.permiso_no_molestar),
+            detalle = stringResource(R.string.alarma_no_molestar_detalle),
+            activado = estado.noMolestar,
+            onCambiar = onCambiarNoMolestar,
+        )
     }
 
     if (eligiendoHora) {
@@ -256,13 +245,30 @@ fun AlarmaContenido(
                 TextButton(onClick = {
                     onCambiarHora(estadoReloj.hour * 60 + estadoReloj.minute)
                     eligiendoHora = false
-                }) { Text(stringResource(android.R.string.ok)) }
+                }) { Text(stringResource(android.R.string.ok).uppercase(), style = TipoCartel.etiqueta) }
             },
             dismissButton = {
-                TextButton(onClick = { eligiendoHora = false }) { Text(stringResource(R.string.accion_cancelar)) }
+                TextButton(onClick = { eligiendoHora = false }) {
+                    Text(stringResource(R.string.accion_cancelar).uppercase(), style = TipoCartel.etiqueta)
+                }
             },
-            title = { Text(stringResource(R.string.alarma_cambiar_hora)) },
-            text = { TimePicker(state = estadoReloj) },
+            title = { Text(stringResource(R.string.alarma_cambiar_hora), style = TipoCartel.titulo) },
+            // Selector sin rellenos grises: contornos y el color interactivo.
+            text = {
+                TimePicker(
+                    state = estadoReloj,
+                    colors = TimePickerDefaults.colors(
+                        clockDialColor = esquema.background,
+                        selectorColor = esquema.primary,
+                        timeSelectorSelectedContainerColor = esquema.background,
+                        timeSelectorUnselectedContainerColor = esquema.background,
+                        timeSelectorSelectedContentColor = esquema.primary,
+                    ),
+                )
+            },
+            tonalElevation = 0.dp,
+            containerColor = esquema.background,
+            modifier = Modifier.border(Bordes.normal, esquema.outline, Formas.tarjeta),
         )
     }
 }
@@ -270,28 +276,30 @@ fun AlarmaContenido(
 @Composable
 private fun OpcionFuente(
     icono: ImageVector,
-    colorIcono: Color,
     titulo: String,
     detalle: String,
     seleccionada: Boolean,
     onClick: () -> Unit,
 ) {
-    TarjetaDescansa(modifier = Modifier.fillMaxWidth(), seleccionada = seleccionada, onClick = onClick) {
+    val esquema = MaterialTheme.colorScheme
+    TarjetaCartel(Modifier.fillMaxWidth(), onClick = onClick, seleccionada = seleccionada) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icono, contentDescription = null, tint = colorIcono)
-            Spacer(Modifier.width(16.dp))
-            Column {
-                Text(titulo, style = MaterialTheme.typography.titleMedium, color = Texto)
-                Text(detalle, style = MaterialTheme.typography.bodyMedium, color = TextoAtenuado)
+            Icon(icono, contentDescription = null, tint = esquema.primary)
+            Spacer(Modifier.width(Espacio.l))
+            Column(Modifier.weight(1f)) {
+                Text(titulo, style = TipoCartel.titulo, color = esquema.onBackground)
+                Text(detalle, style = TipoCartel.cuerpo, color = esquema.onBackground)
             }
+            // La selección se indica con borde grueso Y con ✓ (no solo con color).
+            if (seleccionada) Text("✓", style = TipoCartel.titulo, color = esquema.primary)
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF0F1B2D, heightDp = 1000)
+@PreviewLightDark
 @Composable
 private fun AlarmaPreview() {
-    DescansaTheme {
+    DescansaTheme(nocturno = androidx.compose.foundation.isSystemInDarkTheme()) {
         AlarmaContenido(AlarmaUiState(), {}, {}, {}, {}, {}, {})
     }
 }

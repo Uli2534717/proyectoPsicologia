@@ -1,32 +1,16 @@
 package com.upt.descansa.feature.modonoche
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Bedtime
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ErrorOutline
-import com.upt.descansa.core.theme.Advertencia
-import com.upt.descansa.domain.alarma.AlarmaProgramada
-import com.upt.descansa.domain.alarma.AlarmaRespaldo
-import java.time.Instant
-import java.time.ZoneId
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,8 +22,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -47,19 +31,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.upt.descansa.R
-import com.upt.descansa.core.designsystem.EtiquetaSeccion
-import com.upt.descansa.core.designsystem.FormaPildora
-import com.upt.descansa.core.theme.Borde
-import com.upt.descansa.core.theme.BordeTenue
-import com.upt.descansa.core.theme.DescansaTheme
-import com.upt.descansa.core.theme.FondoModoNoche
-import com.upt.descansa.core.theme.Lavanda
-import com.upt.descansa.core.theme.SuperficieSecundaria
-import com.upt.descansa.core.theme.Texto
-import com.upt.descansa.core.theme.TextoAtenuado
-import com.upt.descansa.core.theme.Turquesa
+import com.upt.descansa.core.designsystem.components.AdornoEtiqueta
+import com.upt.descansa.core.designsystem.components.BotonPildora
+import com.upt.descansa.core.designsystem.components.EtiquetaCategoria
+import com.upt.descansa.core.designsystem.components.PantallaCartel
+import com.upt.descansa.core.designsystem.components.SeparadorOnda
+import com.upt.descansa.core.designsystem.components.TarjetaCartel
+import com.upt.descansa.core.designsystem.theme.Bordes
+import com.upt.descansa.core.designsystem.theme.Espacio
+import com.upt.descansa.core.designsystem.theme.Formas
+import com.upt.descansa.core.designsystem.theme.LocalColoresCartel
+import com.upt.descansa.core.designsystem.theme.TemaNocturno
+import com.upt.descansa.core.designsystem.theme.TipoCartel
 import com.upt.descansa.core.util.formatearHora
 import com.upt.descansa.core.util.inicioVentana
+import com.upt.descansa.domain.alarma.AlarmaProgramada
+import com.upt.descansa.domain.alarma.AlarmaRespaldo
 import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.FuenteDatos
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
@@ -68,7 +55,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 /** Lee los ajustes de la noche y la alarma de respaldo REAL que está programada. */
@@ -88,12 +77,8 @@ class ModoNocheViewModel @Inject constructor(
 }
 
 /**
- * Pantalla 8 · Modo noche activo.
- *
- * Fondo casi negro y poco texto para no iluminar el cuarto.
- * FASE 0: muestra lo configurado y "Detener" (con confirmación) lleva al
- * resumen de la mañana. En las Fases 1–3 esta pantalla reflejará el estado
- * real del servicio nocturno, la alarma de respaldo y No molestar.
+ * Pantalla 8 · Modo noche activo (turquesa: DESCANSA).
+ * SIEMPRE en tema nocturno y con poco texto, para no iluminar el cuarto.
  */
 @Composable
 fun ModoNocheScreen(
@@ -136,103 +121,75 @@ fun ModoNocheContenido(ajustes: AjustesUsuario, respaldo: String?, onDetener: ()
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(FondoModoNoche)
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(Modifier.height(48.dp))
-        Icon(Icons.Outlined.Bedtime, contentDescription = null, tint = Lavanda, modifier = Modifier.size(40.dp))
-        Text(formatearHora(minutoActual), style = MaterialTheme.typography.displayLarge, color = Texto.copy(alpha = 0.85f))
-        Text(stringResource(R.string.modo_noche_activo), style = MaterialTheme.typography.titleMedium, color = TextoAtenuado)
-        Spacer(Modifier.height(24.dp))
-        Surface(
-            color = SuperficieSecundaria.copy(alpha = 0.6f),
-            shape = MaterialTheme.shapes.medium,
-            border = BorderStroke(1.dp, BordeTenue),
-            modifier = Modifier.fillMaxWidth(),
+    TemaNocturno {
+        val esquema = MaterialTheme.colorScheme
+        PantallaCartel(
+            palabra = stringResource(R.string.palabra_modo_noche),
+            colorPalabra = LocalColoresCartel.current.turquesa,
+            titulo = stringResource(R.string.modo_noche_activo),
+            imagen = R.drawable.img_modo_noche_lampara,
+            descripcionImagen = stringResource(R.string.img_modo_noche_lampara),
+            nocturna = true,
+            accionPrincipal = {
+                Text(stringResource(R.string.modo_noche_colchon), style = TipoCartel.cuerpo, color = esquema.onBackground)
+                BotonPildora(stringResource(R.string.modo_noche_detener), onClick = { confirmando = true })
+            },
         ) {
-            Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                EtiquetaSeccion(stringResource(R.string.alarma_titulo))
-                Text(stringResource(R.string.modo_noche_rango, desde, horaLimite), style = MaterialTheme.typography.titleLarge, color = Texto)
-                Text(stringResource(R.string.modo_noche_a_mas_tardar, horaLimite), style = MaterialTheme.typography.bodyMedium, color = TextoAtenuado)
+            Text(formatearHora(minutoActual), style = TipoCartel.hora, color = esquema.onBackground)
+            TarjetaCartel(Modifier.fillMaxWidth()) {
+                EtiquetaCategoria(stringResource(R.string.alarma_titulo), adorno = AdornoEtiqueta.NINGUNO)
+                Text(stringResource(R.string.modo_noche_rango, desde, horaLimite), style = TipoCartel.subtitulo, color = esquema.onBackground)
+                Text(stringResource(R.string.modo_noche_a_mas_tardar, horaLimite), style = TipoCartel.cuerpo, color = esquema.onBackground)
             }
-        }
-        Spacer(Modifier.height(24.dp))
-        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (ajustes.noMolestarActivado) LineaActivada(stringResource(R.string.modo_noche_no_molestar))
+            SeparadorOnda()
+            if (ajustes.noMolestarActivado) Linea(Icons.Outlined.Check, stringResource(R.string.modo_noche_no_molestar))
             if (respaldo != null) {
-                LineaActivada(stringResource(R.string.modo_noche_respaldo, respaldo))
+                Linea(Icons.Outlined.Check, stringResource(R.string.modo_noche_respaldo, respaldo))
             } else {
-                LineaAdvertencia(stringResource(R.string.modo_noche_sin_respaldo))
+                Linea(Icons.Outlined.ErrorOutline, stringResource(R.string.modo_noche_sin_respaldo))
             }
             val fuente = stringResource(
                 if (ajustes.fuente == FuenteDatos.SMARTWATCH) R.string.alarma_fuente_reloj else R.string.alarma_fuente_telefono,
             )
-            LineaActivada(stringResource(R.string.modo_noche_fuente, fuente.lowercase()))
+            Linea(Icons.Outlined.Check, stringResource(R.string.modo_noche_fuente, fuente.lowercase()))
         }
-        Spacer(Modifier.weight(1f))
-        Text(
-            stringResource(R.string.modo_noche_colchon),
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextoAtenuado,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(16.dp))
-        OutlinedButton(
-            onClick = { confirmando = true },
-            shape = FormaPildora,
-            border = BorderStroke(1.5.dp, Borde),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp)
-                .padding(bottom = 0.dp),
-        ) {
-            Text(stringResource(R.string.modo_noche_detener), style = MaterialTheme.typography.labelLarge, color = Texto)
+
+        if (confirmando) {
+            AlertDialog(
+                onDismissRequest = { confirmando = false },
+                title = { Text(stringResource(R.string.modo_noche_confirmar_titulo), style = TipoCartel.titulo) },
+                text = { Text(stringResource(R.string.modo_noche_confirmar_texto), style = TipoCartel.cuerpo) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        confirmando = false
+                        onDetener()
+                    }) { Text(stringResource(R.string.modo_noche_detener).uppercase(), style = TipoCartel.etiqueta) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { confirmando = false }) {
+                        Text(stringResource(R.string.accion_cancelar).uppercase(), style = TipoCartel.etiqueta)
+                    }
+                },
+                tonalElevation = 0.dp,
+                containerColor = esquema.background,
+                modifier = Modifier.border(Bordes.normal, esquema.outline, Formas.tarjeta),
+            )
         }
-        Spacer(Modifier.height(16.dp))
-    }
-
-    if (confirmando) {
-        AlertDialog(
-            onDismissRequest = { confirmando = false },
-            title = { Text(stringResource(R.string.modo_noche_confirmar_titulo)) },
-            text = { Text(stringResource(R.string.modo_noche_confirmar_texto)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmando = false
-                    onDetener()
-                }) { Text(stringResource(R.string.modo_noche_detener)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { confirmando = false }) { Text(stringResource(R.string.accion_cancelar)) }
-            },
-        )
     }
 }
 
+/** Línea de estado: ✓ si está activo, ⚠ si falta (el ícono es de estado). */
 @Composable
-private fun LineaActivada(texto: String) {
+private fun Linea(icono: ImageVector, texto: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(Icons.Outlined.Check, contentDescription = null, tint = Turquesa)
-        Spacer(Modifier.width(16.dp))
-        Text(texto, style = MaterialTheme.typography.bodyLarge, color = Texto)
+        Icon(icono, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.width(Espacio.l))
+        Text(texto, style = TipoCartel.cuerpo, color = MaterialTheme.colorScheme.onBackground)
     }
 }
 
-@Composable
-private fun LineaAdvertencia(texto: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(Icons.Outlined.ErrorOutline, contentDescription = null, tint = Advertencia)
-        Spacer(Modifier.width(16.dp))
-        Text(texto, style = MaterialTheme.typography.bodyLarge, color = Texto)
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF070D17, heightDp = 900)
+@Preview(showBackground = true, heightDp = 1000)
 @Composable
 private fun ModoNochePreview() {
-    DescansaTheme { ModoNocheContenido(ajustes = AjustesUsuario(), respaldo = "07:00", onDetener = {}) }
+    ModoNocheContenido(ajustes = AjustesUsuario(), respaldo = "07:00", onDetener = {})
 }

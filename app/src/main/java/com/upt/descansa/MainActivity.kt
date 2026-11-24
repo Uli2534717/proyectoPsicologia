@@ -13,7 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.upt.descansa.core.navigation.DescansaNavegacion
-import com.upt.descansa.core.theme.DescansaTheme
+import com.upt.descansa.core.designsystem.theme.DescansaTheme
+import com.upt.descansa.core.designsystem.theme.esNocturno
 import com.upt.descansa.sistema.alarma.TimbreActivity
 import com.upt.descansa.sistema.alarma.TimbreService
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,15 +34,16 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // App siempre oscura: íconos claros en las barras del sistema.
-        val barras = SystemBarStyle.dark(Color.TRANSPARENT)
+        // Barras transparentes; el color de sus íconos lo decide el tema (ver Theme.kt).
+        val barras = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
         enableEdgeToEdge(statusBarStyle = barras, navigationBarStyle = barras)
         abrirManana = intent.getBooleanExtra(EXTRA_ABRIR_MANANA, false)
 
         setContent {
-            DescansaTheme {
+            val modoTema by viewModel.modoTema.collectAsStateWithLifecycle()
+            DescansaTheme(nocturno = modoTema.esNocturno()) {
                 val arranque by viewModel.arranque.collectAsStateWithLifecycle()
-                // Mientras se leen los ajustes se ve solo el fondo de la ventana (oscuro).
+                // Mientras se leen los ajustes se ve solo el fondo de la ventana.
                 val listo = arranque as? EstadoArranque.Listo ?: return@DescansaTheme
                 DescansaNavegacion(
                     bienvenidaCompletada = listo.bienvenidaCompletada,

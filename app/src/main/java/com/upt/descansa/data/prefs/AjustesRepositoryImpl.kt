@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.FuenteDatos
+import com.upt.descansa.domain.model.ModoTema
 import com.upt.descansa.domain.model.Sensibilidad
 import com.upt.descansa.domain.repository.AjustesRepository
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +43,7 @@ class AjustesRepositoryImpl @Inject constructor(
         val BIENVENIDA = booleanPreferencesKey("bienvenida_completada")
         val AVISO_SALUD = booleanPreferencesKey("aviso_salud_aceptado")
         val MODO_DESARROLLADOR = booleanPreferencesKey("modo_desarrollador")
+        val MODO_TEMA = stringPreferencesKey("modo_tema")
     }
 
     override val ajustes: Flow<AjustesUsuario> = dataStore.data
@@ -68,6 +70,7 @@ class AjustesRepositoryImpl @Inject constructor(
             bienvenidaCompletada = this[Claves.BIENVENIDA] ?: defecto.bienvenidaCompletada,
             avisoSaludAceptado = this[Claves.AVISO_SALUD] ?: defecto.avisoSaludAceptado,
             modoDesarrollador = this[Claves.MODO_DESARROLLADOR] ?: defecto.modoDesarrollador,
+            modoTema = enumONulo<ModoTema>(this[Claves.MODO_TEMA]) ?: defecto.modoTema,
         )
     }
 
@@ -83,6 +86,7 @@ class AjustesRepositoryImpl @Inject constructor(
         this[Claves.BIENVENIDA] = a.bienvenidaCompletada
         this[Claves.AVISO_SALUD] = a.avisoSaludAceptado
         this[Claves.MODO_DESARROLLADOR] = a.modoDesarrollador
+        this[Claves.MODO_TEMA] = a.modoTema.name
     }
 
     /** Convierte el texto guardado en un enum; si no existe o es inválido, devuelve null. */

@@ -203,4 +203,73 @@
     <string name="ajustes_probar_alarma">Probar alarma en 2 minutos</string>
     <string name="ajustes_probar_alarma_detalle">Programa una alarma de respaldo real para dentro de 2 minutos. Sirve para probarla con el teléfono bloqueado o reiniciado.</string>
     <string name="ajustes_alarma_programada">Alarma programada para las %1$s.</string>
+
+    <!-- ===================== Sistema de diseño "Cartel sereno" ===================== -->
+    <!-- Palabras gigantes (decorativas: TalkBack no las lee). Turquesa = noche; amarillo = día. -->
+    <string name="palabra_bienvenida">DESCANSA</string>
+    <string name="palabra_inicio">DUERME</string>
+    <string name="palabra_pendientes">SUELTA</string>
+    <string name="palabra_respiracion">RESPIRA</string>
+    <string name="palabra_relajacion">CALMA</string>
+    <string name="palabra_sonidos">SUEÑA</string>
+    <string name="palabra_alarma">DESPIERTA</string>
+    <string name="palabra_modo_noche">DESCANSA</string>
+    <string name="palabra_manana">ÁNIMO</string>
+    <string name="palabra_aprender">APRENDE</string>
+    <string name="palabra_ajustes">AJUSTA</string>
+    <string name="palabra_inhala">INHALA</string>
+    <string name="palabra_sosten">SOSTÉN</string>
+    <string name="palabra_exhala">EXHALA</string>
+
+    <!-- Logotipo, sello y menú -->
+    <string name="logotipo_subtitulo">Sueño · Mente · Calma</string>
+    <string name="sello_destacado_texto">DESTACADO · DESTACADO · DESTACADO · </string>
+    <string name="sello_destacado_descripcion">Destacado</string>
+    <string name="menu">Menú</string>
+    <string name="menu_abrir">Abrir menú</string>
+    <string name="menu_cerrar">Cerrar</string>
+    <string name="menu_inicio">Inicio</string>
+    <string name="menu_noche">Preparar mi noche</string>
+    <string name="menu_respiracion">Respiración</string>
+    <string name="menu_relajacion">Relajación</string>
+    <string name="menu_sonidos">Sonidos</string>
+    <string name="menu_alarma">Alarma</string>
+    <string name="menu_manana">Despertar</string>
+    <string name="menu_aprender">Aprender</string>
+    <string name="menu_ajustes">Ajustes</string>
+
+    <!-- Tema -->
+    <string name="ajustes_tema">Tema</string>
+    <string name="ajustes_tema_automatico">Automático</string>
+    <string name="ajustes_tema_claro">Claro</string>
+    <string name="ajustes_tema_oscuro">Oscuro</string>
+    <string name="ajustes_tema_detalle">Respiración, Modo noche y la alarma siempre usan el tema nocturno para no deslumbrarte.</string>
+
+    <!-- Descripciones de imágenes para TalkBack (ver docs/IMAGENES.md) -->
+    <string name="img_bienvenida_lampara_luna">Lámpara con forma de luna</string>
+    <string name="img_inicio_almohada">Una almohada</string>
+    <string name="img_vaciado_cuaderno">Un cuaderno abierto</string>
+    <string name="img_respiracion_vela">Una vela encendida</string>
+    <string name="img_relajacion_manta">Una manta doblada</string>
+    <string name="img_sonido_lluvia">Lluvia</string>
+    <string name="img_sonido_ruido_blanco">Un ventilador</string>
+    <string name="img_sonido_olas">Una caracola de mar</string>
+    <string name="img_sonido_bosque">Una piña de pino</string>
+    <string name="img_alarma_despertador">Un despertador</string>
+    <string name="img_modo_noche_lampara">Una lámpara de buró</string>
+    <string name="img_manana_taza">Una taza</string>
+    <string name="img_aprender_lampara">Una lámpara</string>
+    <string name="img_aprender_reloj_arena">Un reloj de arena</string>
+    <string name="img_aprender_te">Una taza de té</string>
+    <string name="img_aprender_cuaderno">Un cuaderno</string>
+    <string name="img_ajustes_audifonos">Unos audífonos</string>
+
+    <!-- Textos cortos para FilaDeTres -->
+    <string name="inicio_accesos">Antes de dormir</string>
+    <string name="leyenda_pendientes">Suelta lo que te preocupa</string>
+    <string name="leyenda_respiracion">Tres minutos de calma</string>
+    <string name="leyenda_sonidos">Para conciliar el sueño</string>
+    <string name="sonidos_leyenda_ruido_blanco">Constante y suave</string>
+    <string name="sonidos_leyenda_olas">Ritmo lento</string>
+    <string name="sonidos_leyenda_bosque">Grillos y viento</string>
 </resources>
