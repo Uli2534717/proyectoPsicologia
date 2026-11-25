@@ -2,33 +2,46 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- ===================== Permisos (cada uno con su porqué) ===================== -->
-
-    <!-- Alarmas exactas. Android 13+: USE_EXACT_ALARM, que es para apps de
-         despertador; se concede solo y el usuario no lo puede revocar.
-         Android 12 (API 31-32) no tiene USE_EXACT_ALARM: ahí se usa
-         SCHEDULE_EXACT_ALARM, que en esas versiones viene concedido. -->
+    <!-- ===== Alarma de respaldo (Fase 1). Ver docs/DECISIONES.md, D-11. ===== -->
+    <!--
+        Alarmas exactas. USE_EXACT_ALARM (Android 13+) es para apps de despertador:
+        se concede al instalar y el usuario no la puede quitar. En Android 12 y 12L
+        esa no existe y se usa SCHEDULE_EXACT_ALARM (por eso maxSdkVersion="32").
+    -->
     <uses-permission
         android:name="android.permission.SCHEDULE_EXACT_ALARM"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-
-    <!-- Notificación de la alarma (Android 13+ lo pide al usuario, en contexto). -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Mostrar la pantalla de timbre sobre la pantalla de bloqueo. -->
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-
-    <!-- Reprogramar la alarma después de reiniciar el teléfono. -->
+    <!-- Volver a programar la alarma después de reiniciar el teléfono. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <!-- Servicio en primer plano mientras suena la alarma (tipo systemExempted). -->
+    <!-- Servicio en primer plano que hace sonar la alarma. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
-
-    <!-- Vibración de la alarma y mantener la CPU despierta mientras suena. -->
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Notificación de la alarma y pantalla de timbre sobre el bloqueo. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <!-- Mantener la CPU despierta y vibrar mientras suena. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- ===== Servicio nocturno (Fase 2). Ver docs/DECISIONES.md, D-12. ===== -->
+    <!--
+        Tipo "health": servicio largo para apps de bienestar. Android exige,
+        además, HIGH_SAMPLING_RATE_SENSORS (permiso normal, sin diálogo) o un
+        permiso de sensores corporales. Leemos el acelerómetro a ~5 Hz, no más.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission
+        android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"
+        tools:ignore="HighSamplingRate" />
+
+    <!-- ===== No molestar (Fase 3). Ver docs/DECISIONES.md, D-13. ===== -->
+    <!--
+        Se declara aquí, pero el usuario debe darlo a mano en
+        Ajustes de Android → "Acceso a No molestar" (la app lo lleva ahí).
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <!--
         android:name: clase Application con @HiltAndroidApp (activa Hilt).
@@ -59,47 +72,56 @@
             </intent-filter>
         </activity>
 
-        <!-- ================= Alarma de respaldo (Fase 1, sección 6.2) =================
-             directBootAware="true": estos componentes funcionan aunque el teléfono
-             se haya reiniciado y aún nadie lo desbloquee (PIN o huella). -->
-
-        <!-- Pantalla de timbre: encima de la pantalla de bloqueo y enciende la pantalla.
-             taskAffinity vacío: no se mezcla con la pila de pantallas de la app. -->
+        <!--
+            directBootAware="true" en la pantalla de timbre, su servicio y los dos
+            receptores: funcionan aunque el teléfono se haya reiniciado y nadie lo
+            haya desbloqueado todavía (PIN o huella). Ver docs/DECISIONES.md, D-14.
+        -->
+        <!--
+            Pantalla de timbre: tarea propia (taskAffinity vacío) para no mezclarse
+            con la app, y fuera de "recientes" porque solo tiene sentido mientras suena.
+        -->
         <activity
             android:name=".sistema.alarma.TimbreActivity"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:showWhenLocked="true"
             android:taskAffinity=""
             android:theme="@style/Theme.Descansa"
             android:turnScreenOn="true" />
 
-        <!-- Hace sonar la alarma. -->
+        <service
+            android:name=".sistema.noche.ServicioNocturno"
+            android:exported="false"
+            android:foregroundServiceType="health" />
+
         <service
             android:name=".sistema.alarma.TimbreService"
             android:directBootAware="true"
             android:exported="false"
-            android:foregroundServiceType="systemExempted" />
+            android:foregroundServiceType="systemExempted|mediaPlayback" />
 
-        <!-- Recibe el aviso de AlarmManager (solo la propia app lo puede enviar). -->
+        <!-- Lo llama AlarmManager a la hora de la alarma (no lo pueden llamar otras apps). -->
         <receiver
             android:name=".sistema.alarma.AlarmaReceiver"
             android:directBootAware="true"
             android:exported="false" />
 
-        <!-- Reprograma tras reinicio, actualización de la app o cambio de hora/zona.
-             exported="true" para que el sistema lo pueda avisar; son broadcasts
-             protegidos que ninguna otra app puede enviar. -->
+        <!--
+            exported="true" porque estos avisos los manda el sistema; son "protegidos",
+            así que ninguna otra app puede enviarlos.
+        -->
         <receiver
-            android:name=".sistema.alarma.ReinicioReceiver"
+            android:name=".sistema.alarma.ArranqueReceiver"
             android:directBootAware="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>

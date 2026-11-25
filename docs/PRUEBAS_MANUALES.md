@@ -31,45 +31,74 @@ distintas** (sección 15 del documento).
 
 ## Fase 1 · Alarma de respaldo (teléfono real)
 
-Preparación: Ajustes de la app → activar **Modo desarrollador** → aparece
-**"Probar alarma en 2 minutos"**.
+Atajo: en Ajustes, activa **Modo desarrollador** y toca **Probar alarma en 10
+segundos**; después bloquea el teléfono.
 
-> **Resultado en emulador (Pixel 9a, API 37, 24/11/2026):** ✅ con pantalla
-> bloqueada se encendió sola y mostró la pantalla de timbre; audio `USAGE_ALARM`
-> sonando; servicio iniciado por la exención `ALARM_MANAGER_ALARM_CLOCK`.
-> ✅ Posponer reprogramó +5 min. ✅ Tras reiniciar, la alarma se reprogramó
-> sola y, como su hora pasó con el teléfono apagado, sonó al arrancar.
-> ✅ Detener desde la notificación apagó sonido y servicio.
-> Falta: repetir en dos teléfonos reales (con PIN) y las pruebas de abajo.
+En el emulador (Pixel 9, API 37) ya se comprobó: la alarma de prueba suena con el
+teléfono bloqueado, aparece la pantalla de timbre, "Apagar" abre el resumen, y
+tras reiniciar la alarma de las 07:00 se vuelve a programar. También (D-14): con
+PIN y sin desbloquear tras reiniciar, la alarma suena y se apaga; el cambio de
+zona horaria conserva la hora del reloj.
 
-- [ ] **Permisos en contexto:** la primera vez que se pulsa "Activar modo
-      noche" aparece la explicación de notificaciones ANTES del diálogo de Android.
-- [ ] **Modo noche** muestra "Alarma de respaldo a las HH:mm" con la hora real.
-      En la barra de estado aparece el ícono de reloj de Android.
-- [ ] **Teléfono bloqueado:** programar la prueba, bloquear con el botón de
-      encendido y esperar. La pantalla se enciende y aparece "Hora de despertar"
-      sobre la pantalla de bloqueo, con volumen creciente y vibración suave.
-- [ ] **Con PIN o huella:** lo mismo; se puede Detener o Posponer sin desbloquear.
-- [ ] **Volumen multimedia en 0 y modo silencio/vibración:** la alarma suena igual.
-- [ ] **Posponer:** deja de sonar y vuelve a sonar después de los minutos configurados.
-- [ ] **Detener:** deja de sonar; al desbloquear se abre "Buenos días".
-- [ ] **Detener desde la notificación** (si se estaba usando el teléfono):
-      la alarma aparece como notificación emergente y sus botones funcionan.
-- [ ] **Reinicio sin desbloquear:** programar la prueba, reiniciar el teléfono
-      y NO desbloquearlo. Suena a la hora.
-- [ ] **Reinicio y desbloqueo:** igual, desbloqueando después de encender.
-- [ ] **App cerrada desde Recientes:** suena igual.
-- [ ] **Cambio de zona horaria** con alarma de 07:00 programada: sigue a las
-      07:00 de la nueva zona (ver Modo noche).
-- [ ] **"Forzar detención"** (limitación de Android, D-15): la alarma se
-      pierde. Anotar que se comprobó.
-- [ ] La alarma deja de sonar sola a los 30 minutos.
+- [ ] Paso 5 → "Activar modo noche": en Android 13+ pide el permiso de notificaciones.
+- [ ] Aparece el ícono de alarma ⏰ en la barra de estado (alarma programada).
+- [ ] Con el teléfono **bloqueado**, la alarma enciende la pantalla y muestra "Es hora de despertar".
+- [ ] El volumen empieza bajo y sube durante ~1 minuto; el teléfono vibra.
+- [ ] Con el volumen de alarmas en 0, aun así se escucha.
+- [ ] "Apagar" detiene el sonido y abre el resumen de la mañana.
+- [ ] "Posponer" la vuelve a hacer sonar tras los minutos elegidos en Ajustes.
+- [ ] Los botones Apagar/Posponer de la **notificación** también funcionan.
+- [ ] **Negando** las notificaciones: la alarma suena igual, y el modo noche muestra el aviso "falta un permiso".
+- [ ] Con No molestar del sistema activado, la alarma suena.
+- [ ] **Reinicio:** activar el modo noche, reiniciar, desbloquear: la alarma sigue programada.
+- [ ] **Reinicio sin desbloquear** (con PIN): programar la prueba, reiniciar y NO desbloquear. Suena a la hora y se puede apagar sin desbloquear.
+- [ ] Tras apagarla sin desbloquear, al desbloquear el No molestar se quita y la noche aparece cerrada.
+- [ ] **Cambio de zona horaria** con alarma de 07:00 programada: sigue a las 07:00 de la nueva zona.
+- [ ] Con música sonando, la alarma la pausa.
+- [ ] Cerrar la app deslizándola desde "recientes": la alarma suena igual.
+- [ ] "Detener" en el modo noche cancela la alarma (desaparece el ⏰).
+- [ ] Si nadie la apaga, se calla sola a los 10 minutos.
+
+> "Forzar detención" desde Ajustes de Android **cancela todas las alarmas de la
+> app**: así funciona Android y ninguna app lo puede evitar. Por eso no se
+> incluye como prueba.
+
+## Fase 2 · Servicio nocturno y motor
+
+Simulador: en Ajustes, con **Modo desarrollador** activado, toca **Simular noche
+inquieta** o **Simular noche tranquila** y bloquea el teléfono. Cada una dura 1 minuto.
+
+En el emulador (API 37) ya se comprobó: la inquieta suena a los ~41 s (dentro de
+la ventana) con motivo `SUENO_LIGERO`, y la tranquila a los 60 s con `HORA_LIMITE`.
+Con el acelerómetro real se guardó una época por minuto con la pantalla apagada.
+
+- [ ] Noche inquieta simulada: suena antes del minuto.
+- [ ] Noche tranquila simulada: suena justo al minuto.
+- [ ] Al activar el modo noche aparece la notificación discreta "Modo noche activo".
+- [ ] El modo noche muestra "Midiendo movimiento: N min" y el número sube cada minuto.
+- [ ] Cerrar la app y volver a abrirla durante la noche: abre directo en el modo noche.
+- [ ] Con la alarma sonando y las notificaciones negadas, abrir la app muestra la pantalla de timbre.
+- [ ] **Noche real:** teléfono sobre el colchón; anotar a qué hora sonó y si fue antes de la hora límite: ______
+- [ ] Probar las 3 sensibilidades en noches distintas; anotar la que se sintió mejor: ______
+
+## Fase 3 · No molestar
+
+En el emulador (API 37) ya se comprobó: sin permiso se muestra el aviso; con
+permiso se enciende el modo "Do Not Disturb (Descansa)" en solo alarmas, la
+alarma suena igual, y al apagarla el modo se desactiva.
+
+- [ ] Sin el permiso: el modo noche dice "No molestar: falta el permiso" y "Dar permiso" abre Ajustes de Android.
+- [ ] Dar el permiso y regresar: el aviso cambia a "No molestar activo" y aparece el ícono de No molestar.
+- [ ] Durante la noche, una llamada o mensaje de prueba NO suena.
+- [ ] La alarma SÍ suena con el No molestar activo.
+- [ ] Al apagar la alarma, el No molestar se quita solo.
+- [ ] "Detener" también lo quita.
+- [ ] "Posponer" lo mantiene hasta que se apague la alarma.
+- [ ] Con el No molestar del usuario ya activo antes de dormir: al despertar sigue como estaba.
+- [ ] Desactivar "No molestar" en el paso 5: la noche no lo enciende.
 
 ## Fases siguientes (se completan en su fase)
 
-- [ ] Alarma inteligente con el simulador (noche inquieta y noche tranquila).
-- [ ] Una noche real de prueba.
-- [ ] No molestar se activa y se restaura al detener.
 - [ ] Sonido toda la noche con la pantalla apagada y apagado gradual.
 - [ ] Consumo de batería en 8 horas de sesión: ____ %.
 - [ ] Negar cada permiso uno por uno: la app sigue funcionando y lo explica.
