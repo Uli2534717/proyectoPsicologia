@@ -31,9 +31,9 @@ servidores, sin anuncios. Ver [docs/PRIVACIDAD.md](docs/PRIVACIDAD.md).
 | Fase | Contenido | Estado |
 |---|---|---|
 | 0 | Base, tema, navegación por las 11 pantallas, base de datos | ✅ |
-| 1 | Alarma de respaldo | ⏳ |
-| 2 | Servicio nocturno y motor de decisión | ⏳ |
-| 3 | No molestar | ⏳ |
+| 1 | Alarma de respaldo | ✅ |
+| 2 | Servicio nocturno y motor de decisión | ✅ |
+| 3 | No molestar | ✅ |
 | 4 | Pendientes, respiración y relajación | ⏳ |
 | 5 | Sonidos | ⏳ |
 | 6 | Resumen, Aprender y Ajustes | ⏳ |
@@ -98,3 +98,7 @@ Se mantendrá una lista honesta aquí conforme avancen las fases.
   aproximación, no un estudio clínico.
 - Muchos relojes no transmiten la frecuencia cardíaca en tiempo real; el modo
   smartwatch puede no estar disponible con tu reloj.
+- "Forzar detención" desde Ajustes de Android cancela la alarma programada
+  (comportamiento del sistema). Cerrar la app desde "recientes" no la afecta.
+- Si niegas las notificaciones, la alarma suena igual, pero no aparece su
+  pantalla sobre el bloqueo.

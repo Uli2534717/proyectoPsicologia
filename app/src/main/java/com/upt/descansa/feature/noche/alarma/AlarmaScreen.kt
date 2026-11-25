@@ -1,5 +1,10 @@
 package com.upt.descansa.feature.noche.alarma
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,10 +69,28 @@ fun AlarmaScreen(
     viewModel: AlarmaViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
+    val contexto = LocalContext.current
+
+    // Android 13+: las notificaciones necesitan permiso. Se pide aquí, justo cuando
+    // hace falta (y no en la bienvenida). Si lo niega, la noche se activa igual:
+    // la alarma suena, solo no aparece su pantalla sobre el bloqueo.
+    val pedirNotificaciones = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        viewModel.alActivarModoNoche(onActivarModoNoche)
+    }
+    val activar = {
+        val faltaPermiso = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(contexto, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        if (faltaPermiso) {
+            pedirNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            viewModel.alActivarModoNoche(onActivarModoNoche)
+        }
+    }
+
     AlarmaContenido(
         estado = estado,
         onAtras = onAtras,
-        onActivarModoNoche = onActivarModoNoche,
+        onActivarModoNoche = activar,
         onCambiarHora = viewModel::alCambiarHoraLimite,
         onCambiarVentana = viewModel::alCambiarVentana,
         onCambiarFuente = viewModel::alCambiarFuente,

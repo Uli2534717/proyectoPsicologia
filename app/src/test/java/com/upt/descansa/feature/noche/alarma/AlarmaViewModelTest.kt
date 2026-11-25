@@ -5,7 +5,14 @@ import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.FuenteDatos
 import com.upt.descansa.domain.repository.AjustesRepository
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
+import com.upt.descansa.domain.usecase.noche.ActivarModoNocheUseCase
+import com.upt.descansa.testutil.ControlNoMolestarFalso
+import com.upt.descansa.testutil.ControlServicioNocturnoFalso
 import com.upt.descansa.testutil.MainDispatcherRule
+import com.upt.descansa.testutil.NocheRepositoryFalso
+import com.upt.descansa.testutil.ProgramadorAlarmaFalso
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
@@ -32,12 +39,23 @@ class AlarmaViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var repositorio: AjustesRepositoryFalso
+    private lateinit var programador: ProgramadorAlarmaFalso
     private lateinit var viewModel: AlarmaViewModel
 
     @Before
     fun preparar() {
         repositorio = AjustesRepositoryFalso()
-        viewModel = AlarmaViewModel(ObservarAjustesUseCase(repositorio), repositorio)
+        programador = ProgramadorAlarmaFalso()
+        val activar = ActivarModoNocheUseCase(repositorio, NocheRepositoryFalso(), programador, ControlServicioNocturnoFalso(), ControlNoMolestarFalso())
+        viewModel = AlarmaViewModel(ObservarAjustesUseCase(repositorio), repositorio, activar)
+    }
+
+    @Test
+    fun `activar modo noche programa la alarma y despues navega`() = runTest {
+        var navego = false
+        viewModel.alActivarModoNoche { navego = true }
+        assertTrue(navego)
+        assertNotNull(programador.programadaEn)
     }
 
     @Test

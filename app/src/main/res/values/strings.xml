@@ -133,6 +133,23 @@
     <string name="modo_noche_detener">Detener</string>
     <string name="modo_noche_confirmar_titulo">¿Detener el modo noche?</string>
     <string name="modo_noche_confirmar_texto">Se cancelará la alarma inteligente y la de respaldo.</string>
+    <string name="modo_noche_falta_permiso">Tu alarma sonará, pero falta un permiso para que se vea sobre la pantalla de bloqueo o suene a la hora exacta.</string>
+    <string name="modo_noche_dar_permiso">Revisar permiso</string>
+    <string name="modo_noche_midiendo">Midiendo movimiento: %1$d min</string>
+    <string name="modo_noche_no_molestar_sin_permiso">No molestar: falta el permiso</string>
+    <string name="modo_noche_dar_permiso_no_molestar">Dar permiso</string>
+
+    <!-- Servicio nocturno (notificación) -->
+    <string name="noche_canal">Modo noche</string>
+    <string name="noche_notificacion_texto">Midiendo tu movimiento para despertarte en sueño ligero.</string>
+
+    <!-- Pantalla de timbre (alarma sonando) -->
+    <string name="timbre_canal">Alarma</string>
+    <string name="timbre_titulo">Es hora de despertar</string>
+    <string name="timbre_notificacion_texto">Tu alarma de las %1$s está sonando.</string>
+    <string name="timbre_saludo">Buenos días. Tómate un momento antes de levantarte.</string>
+    <string name="timbre_apagar">Apagar</string>
+    <string name="timbre_posponer">Posponer</string>
 
     <!-- 9. Mañana -->
     <string name="manana_saludo">Buenos días</string>
@@ -178,5 +195,10 @@
     <string name="ajustes_privacidad">Aviso de privacidad</string>
     <string name="ajustes_creditos">Créditos</string>
     <string name="ajustes_desarrollador">Modo desarrollador</string>
+    <string name="ajustes_probar_alarma">Probar alarma en 10 segundos</string>
+    <string name="ajustes_probar_alarma_detalle">Bloquea el teléfono después de tocarlo. Reemplaza la alarma que tengas programada.</string>
+    <string name="ajustes_simular_inquieta">Simular noche inquieta (1 min)</string>
+    <string name="ajustes_simular_tranquila">Simular noche tranquila (1 min)</string>
+    <string name="ajustes_simular_detalle">Noche acelerada: cada segundo cuenta como un minuto y la ventana dura 20. La inquieta debe sonar antes por sueño ligero; la tranquila, a la hora límite. Reemplaza la noche en curso.</string>
     <string name="ajustes_proximamente">Disponible en una próxima fase.</string>
 </resources>

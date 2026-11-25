@@ -28,21 +28,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.upt.descansa.R
 import com.upt.descansa.core.designsystem.EtiquetaSeccion
 import com.upt.descansa.core.designsystem.FormaPildora
+import com.upt.descansa.core.theme.Advertencia
 import com.upt.descansa.core.theme.Borde
 import com.upt.descansa.core.theme.BordeTenue
 import com.upt.descansa.core.theme.DescansaTheme
@@ -57,28 +61,74 @@ import com.upt.descansa.core.util.inicioVentana
 import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.model.FuenteDatos
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
+import com.upt.descansa.domain.repository.ControlNoMolestar
+import com.upt.descansa.domain.repository.NocheRepository
+import com.upt.descansa.domain.usecase.noche.DetenerModoNocheUseCase
+import com.upt.descansa.sistema.alarma.alarmaConTodosLosPermisos
+import com.upt.descansa.sistema.alarma.intentAjustesAlarma
+import com.upt.descansa.sistema.noche.EstadoNocturno
+import com.upt.descansa.sistema.nomolestar.intentPermisoNoMolestar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 import javax.inject.Inject
 
-/** Lee los ajustes con los que se activó la noche, para mostrarlos. */
+/** Lee los ajustes con los que se activó la noche, permite detenerla y cuida el No molestar. */
 @HiltViewModel
-class ModoNocheViewModel @Inject constructor(observarAjustes: ObservarAjustesUseCase) : ViewModel() {
+class ModoNocheViewModel @Inject constructor(
+    private val observarAjustes: ObservarAjustesUseCase,
+    private val detenerModoNoche: DetenerModoNocheUseCase,
+    private val nocheRepositorio: NocheRepository,
+    private val noMolestar: ControlNoMolestar,
+) : ViewModel() {
     val ajustes: StateFlow<AjustesUsuario> =
         observarAjustes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AjustesUsuario())
+
+    private val _permisoNoMolestar = MutableStateFlow(true)
+
+    /** false si el usuario quiere No molestar pero no ha dado el permiso. */
+    val permisoNoMolestar: StateFlow<Boolean> = _permisoNoMolestar
+
+    /**
+     * Cada vez que la pantalla vuelve a verse. Si el usuario ACABA de dar el
+     * permiso en Ajustes de Android (antes faltaba), el No molestar se activa ya.
+     *
+     * Solo en ese cambio, y no siempre: al apagar la alarma esta pantalla se
+     * reanuda un instante mientras la noche se cierra, y si activara "siempre"
+     * volvería a encender el No molestar que el apagado acaba de restaurar.
+     */
+    fun alVolver() {
+        viewModelScope.launch {
+            val quiereNoMolestar = observarAjustes().first().noMolestarActivado
+            val tienePermiso = noMolestar.tienePermiso()
+            val permisoRecienDado = !_permisoNoMolestar.value && tienePermiso
+            _permisoNoMolestar.value = !quiereNoMolestar || tienePermiso
+            if (quiereNoMolestar && permisoRecienDado && nocheRepositorio.nocheActiva() != null) noMolestar.activar()
+        }
+    }
+
+    /** Cancela la alarma de respaldo, cierra la noche y luego llama a [onListo]. */
+    fun alDetener(onListo: () -> Unit) {
+        viewModelScope.launch {
+            detenerModoNoche()
+            onListo()
+        }
+    }
 }
 
 /**
  * Pantalla 8 · Modo noche activo.
  *
  * Fondo casi negro y poco texto para no iluminar el cuarto.
- * FASE 0: muestra lo configurado y "Detener" (con confirmación) lleva al
- * resumen de la mañana. En las Fases 1–3 esta pantalla reflejará el estado
- * real del servicio nocturno, la alarma de respaldo y No molestar.
+ * La alarma de respaldo ya está programada de verdad; "Detener" la cancela.
+ * Muestra los minutos medidos por el servicio nocturno y si el No molestar
+ * está activo. Si falta un permiso, lo avisa y ofrece ir a darlo.
  */
 @Composable
 fun ModoNocheScreen(
@@ -86,11 +136,38 @@ fun ModoNocheScreen(
     viewModel: ModoNocheViewModel = hiltViewModel(),
 ) {
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
-    ModoNocheContenido(ajustes = ajustes, onDetener = onDetenido)
+    val contexto = LocalContext.current
+    // Se revisa cada vez que la pantalla vuelve a verse: el usuario pudo ir a
+    // Ajustes de Android a dar el permiso y regresar.
+    var faltanPermisos by remember { mutableStateOf(false) }
+    LifecycleResumeEffect(Unit) {
+        faltanPermisos = !alarmaConTodosLosPermisos(contexto)
+        viewModel.alVolver()
+        onPauseOrDispose { }
+    }
+    val minutosMedidos by EstadoNocturno.epocasRegistradas.collectAsStateWithLifecycle()
+    val permisoNoMolestar by viewModel.permisoNoMolestar.collectAsStateWithLifecycle()
+    ModoNocheContenido(
+        ajustes = ajustes,
+        minutosMedidos = minutosMedidos,
+        permisoNoMolestar = permisoNoMolestar,
+        onDarPermisoNoMolestar = { contexto.startActivity(intentPermisoNoMolestar()) },
+        faltanPermisos = faltanPermisos,
+        onAbrirPermisos = { contexto.startActivity(intentAjustesAlarma(contexto)) },
+        onDetener = { viewModel.alDetener(onDetenido) },
+    )
 }
 
 @Composable
-fun ModoNocheContenido(ajustes: AjustesUsuario, onDetener: () -> Unit) {
+fun ModoNocheContenido(
+    ajustes: AjustesUsuario,
+    onDetener: () -> Unit,
+    minutosMedidos: Int = 0,
+    permisoNoMolestar: Boolean = true,
+    onDarPermisoNoMolestar: () -> Unit = {},
+    faltanPermisos: Boolean = false,
+    onAbrirPermisos: () -> Unit = {},
+) {
     var confirmando by rememberSaveable { mutableStateOf(false) }
     val horaLimite = formatearHora(ajustes.horaLimiteMinutos)
     val desde = formatearHora(inicioVentana(ajustes.horaLimiteMinutos, ajustes.ventanaMinutos))
@@ -131,12 +208,41 @@ fun ModoNocheContenido(ajustes: AjustesUsuario, onDetener: () -> Unit) {
         }
         Spacer(Modifier.height(24.dp))
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (ajustes.noMolestarActivado) LineaActivada(stringResource(R.string.modo_noche_no_molestar))
+            if (ajustes.noMolestarActivado && permisoNoMolestar) {
+                LineaActivada(stringResource(R.string.modo_noche_no_molestar))
+            } else if (ajustes.noMolestarActivado) {
+                // Honestidad: no decimos "No molestar activo" si no pudimos activarlo.
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.modo_noche_no_molestar_sin_permiso),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Advertencia,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = onDarPermisoNoMolestar, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text(stringResource(R.string.modo_noche_dar_permiso_no_molestar), color = Lavanda)
+                    }
+                }
+            }
             LineaActivada(stringResource(R.string.modo_noche_respaldo, horaLimite))
             val fuente = stringResource(
                 if (ajustes.fuente == FuenteDatos.SMARTWATCH) R.string.alarma_fuente_reloj else R.string.alarma_fuente_telefono,
             )
             LineaActivada(stringResource(R.string.modo_noche_fuente, fuente.lowercase()))
+            LineaActivada(stringResource(R.string.modo_noche_midiendo, minutosMedidos))
+        }
+        if (faltanPermisos) {
+            // Honestidad: si la alarma no se verá o puede retrasarse, se dice y se ofrece arreglarlo.
+            Spacer(Modifier.height(16.dp))
+            Text(
+                stringResource(R.string.modo_noche_falta_permiso),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Advertencia,
+                textAlign = TextAlign.Center,
+            )
+            TextButton(onClick = onAbrirPermisos, modifier = Modifier.heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.modo_noche_dar_permiso), color = Lavanda)
+            }
         }
         Spacer(Modifier.weight(1f))
         Text(

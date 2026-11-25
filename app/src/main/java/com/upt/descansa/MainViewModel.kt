@@ -2,6 +2,7 @@ package com.upt.descansa
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upt.descansa.domain.repository.NocheRepository
 import com.upt.descansa.domain.usecase.ajustes.ObservarAjustesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,8 +17,14 @@ sealed interface EstadoArranque {
     /** Todavía se están leyendo los ajustes (unos milisegundos). */
     data object Cargando : EstadoArranque
 
-    /** Ya se sabe si hay que mostrar la Bienvenida. */
-    data class Listo(val bienvenidaCompletada: Boolean) : EstadoArranque
+    /**
+     * Ya se sabe con qué pantalla abrir.
+     * @property nocheEnCurso hay una noche activa: se abre el modo noche.
+     */
+    data class Listo(
+        val bienvenidaCompletada: Boolean,
+        val nocheEnCurso: Boolean = false,
+    ) : EstadoArranque
 }
 
 /**
@@ -27,9 +34,15 @@ sealed interface EstadoArranque {
 @HiltViewModel
 class MainViewModel @Inject constructor(
     observarAjustes: ObservarAjustesUseCase,
+    nocheRepositorio: NocheRepository,
 ) : ViewModel() {
 
     val arranque: StateFlow<EstadoArranque> = flow<EstadoArranque> {
-        emit(EstadoArranque.Listo(observarAjustes().first().bienvenidaCompletada))
+        emit(
+            EstadoArranque.Listo(
+                bienvenidaCompletada = observarAjustes().first().bienvenidaCompletada,
+                nocheEnCurso = nocheRepositorio.nocheActiva() != null,
+            ),
+        )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, EstadoArranque.Cargando)
 }

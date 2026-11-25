@@ -19,6 +19,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,10 +71,16 @@ private fun NavDestination?.muestraBarra(): Boolean =
  * y TODO el flujo de la app se lee en este único archivo.
  *
  * @param bienvenidaCompletada decide si la app abre en Bienvenida o en Inicio.
+ * @param abrirManana true cuando se acaba de apagar la alarma: se abre el resumen.
+ * @param onMananaAbierta avisa que ya se navegó, para no repetirlo.
+ * @param nocheEnCurso true si al abrir la app ya hay una noche activa: se abre el modo noche.
  */
 @Composable
 fun DescansaNavegacion(
     bienvenidaCompletada: Boolean,
+    abrirManana: Boolean = false,
+    onMananaAbierta: () -> Unit = {},
+    nocheEnCurso: Boolean = false,
     navController: NavHostController = rememberNavController(),
 ) {
     val entradaActual by navController.currentBackStackEntryAsState()
@@ -142,7 +149,28 @@ fun DescansaNavegacion(
                 MananaScreen(onVolverAlInicio = { navController.irAPestana(RutaInicio) })
             }
             composable<RutaAprender> { AprenderScreen() }
-            composable<RutaAjustes> { AjustesScreen(onAtras = navController::popBackStack) }
+            composable<RutaAjustes> {
+                AjustesScreen(
+                    onAtras = navController::popBackStack,
+                    // Simulador (modo desarrollador): igual que activar una noche real.
+                    onSimulacionIniciada = { navController.navigate(RutaModoNoche) { popUpTo(RutaInicio) } },
+                )
+            }
+        }
+
+        // Estos efectos van DESPUÉS del NavHost: así la gráfica de navegación ya existe
+        // cuando navegan (si fueran antes, en un arranque en frío fallarían).
+
+        // Se abrió la app con una noche en curso: directo al modo noche.
+        LaunchedEffect(nocheEnCurso) {
+            if (nocheEnCurso && !abrirManana) navController.navigate(RutaModoNoche) { popUpTo(RutaInicio) }
+        }
+        // Al apagar la alarma: Inicio → Mañana (también quita el modo noche de la pila).
+        LaunchedEffect(abrirManana) {
+            if (abrirManana) {
+                navController.navigate(RutaManana) { popUpTo(RutaInicio) }
+                onMananaAbierta()
+            }
         }
     }
 }
