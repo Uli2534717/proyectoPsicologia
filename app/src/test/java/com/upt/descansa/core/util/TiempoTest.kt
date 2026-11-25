@@ -67,4 +67,23 @@ class TiempoTest {
         val alarma = proximaOcurrencia(ahora, 2 * 60 + 30)
         assertEquals(ZonedDateTime.of(2026, 3, 8, 3, 30, 0, 0, nuevaYork), alarma)
     }
+
+    @Test
+    fun `al cambiar de zona la alarma sigue a la misma hora del reloj esa manana`() {
+        val mexico = ZoneId.of("America/Mexico_City")
+        val bogota = ZoneId.of("America/Bogota") // una hora adelante en noviembre
+        val anterior = ZonedDateTime.of(2026, 11, 25, 7, 0, 0, 0, mexico).toInstant().toEpochMilli()
+        val nueva = ocurrenciaMasCercana(anterior, bogota, minutosDelDiaEn(anterior, mexico))
+        assertEquals(ZonedDateTime.of(2026, 11, 25, 7, 0, 0, 0, bogota).toInstant().toEpochMilli(), nueva)
+    }
+
+    @Test
+    fun `cerca de la medianoche no se salta un dia`() {
+        val zona = ZoneId.of("America/Mexico_City")
+        val anterior = ZonedDateTime.of(2026, 11, 25, 0, 10, 0, 0, zona).toInstant().toEpochMilli()
+        // La zona nueva va una hora atrás: en ella el instante anterior es el 24 a las 23:10.
+        val atras = ZoneId.of("America/Denver")
+        val nueva = ocurrenciaMasCercana(anterior, atras, 10)
+        assertEquals(ZonedDateTime.of(2026, 11, 25, 0, 10, 0, 0, atras).toInstant().toEpochMilli(), nueva)
+    }
 }

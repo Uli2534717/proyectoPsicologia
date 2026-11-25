@@ -36,7 +36,9 @@ segundos**; después bloquea el teléfono.
 
 En el emulador (Pixel 9, API 37) ya se comprobó: la alarma de prueba suena con el
 teléfono bloqueado, aparece la pantalla de timbre, "Apagar" abre el resumen, y
-tras reiniciar la alarma de las 07:00 se vuelve a programar.
+tras reiniciar la alarma de las 07:00 se vuelve a programar. También (D-14): con
+PIN y sin desbloquear tras reiniciar, la alarma suena y se apaga; el cambio de
+zona horaria conserva la hora del reloj.
 
 - [ ] Paso 5 → "Activar modo noche": en Android 13+ pide el permiso de notificaciones.
 - [ ] Aparece el ícono de alarma ⏰ en la barra de estado (alarma programada).
@@ -49,6 +51,10 @@ tras reiniciar la alarma de las 07:00 se vuelve a programar.
 - [ ] **Negando** las notificaciones: la alarma suena igual, y el modo noche muestra el aviso "falta un permiso".
 - [ ] Con No molestar del sistema activado, la alarma suena.
 - [ ] **Reinicio:** activar el modo noche, reiniciar, desbloquear: la alarma sigue programada.
+- [ ] **Reinicio sin desbloquear** (con PIN): programar la prueba, reiniciar y NO desbloquear. Suena a la hora y se puede apagar sin desbloquear.
+- [ ] Tras apagarla sin desbloquear, al desbloquear el No molestar se quita y la noche aparece cerrada.
+- [ ] **Cambio de zona horaria** con alarma de 07:00 programada: sigue a las 07:00 de la nueva zona.
+- [ ] Con música sonando, la alarma la pausa.
 - [ ] Cerrar la app deslizándola desde "recientes": la alarma suena igual.
 - [ ] "Detener" en el modo noche cancela la alarma (desaparece el ⏰).
 - [ ] Si nadie la apaga, se calla sola a los 10 minutos.

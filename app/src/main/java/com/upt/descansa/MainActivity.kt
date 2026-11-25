@@ -45,8 +45,11 @@ class MainActivity : ComponentActivity() {
 
         // Si la alarma está sonando y se abre la app, se muestra la pantalla de timbre.
         // Sin esto, quien negó las notificaciones no tendría dónde apagarla.
+        // RESUMED y no STARTED: detrás de la pantalla de bloqueo la app está
+        // "iniciada" pero Android bloquea abrir otra pantalla; al volver al frente
+        // (ya desbloqueado) se intenta de nuevo.
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 EstadoTimbre.sonando.collect { sonando ->
                     if (sonando) startActivity(Intent(this@MainActivity, TimbreActivity::class.java))
                 }

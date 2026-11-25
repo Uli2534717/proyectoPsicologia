@@ -128,7 +128,7 @@ Revisado contra la documentación oficial de Android el 23 de noviembre de 2026
 | Permiso de alarmas exactas | `USE_EXACT_ALARM` (Android 13+) y `SCHEDULE_EXACT_ALARM` con `maxSdkVersion="32"` (Android 12) |
 | Sonar | `TimbreService`, servicio en primer plano de tipo `systemExempted\|mediaPlayback` |
 | Pantalla | `TimbreActivity` por notificación de pantalla completa (`USE_FULL_SCREEN_INTENT`) |
-| Reinicio | `ArranqueReceiver` (`BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`) reprograma la hora guardada en SharedPreferences |
+| Reinicio | `ArranqueReceiver` (`LOCKED_BOOT_COMPLETED`, `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`) reprograma la hora guardada; ver D-14 |
 | Volumen | empieza al 10 % y sube durante 60 s; si el volumen de alarmas está en 0, se sube a la mitad |
 | Sin respuesta | se calla a los 10 min y la noche se cierra con motivo `HORA_LIMITE` |
 | Posponer | los minutos de Ajustes (5, 10 o 15); la noche sigue abierta |
@@ -150,11 +150,12 @@ Revisado contra la documentación oficial de Android el 23 de noviembre de 2026
 - Si el teléfono estuvo apagado a la hora de la alarma, al encender suena solo
   si pasó menos de 1 hora (sonar horas después no tendría sentido).
 - La hora se guarda en SharedPreferences (no en DataStore) porque se lee desde un
-  BroadcastReceiver, donde conviene una lectura inmediata.
+  BroadcastReceiver, donde conviene una lectura inmediata. Desde D-14 vive en el
+  almacenamiento protegido por dispositivo.
 
 **Limitaciones conocidas:**
-- Antes de desbloquear el teléfono por primera vez tras reiniciar, Android no
-  entrega `BOOT_COMPLETED`; la alarma se reprograma al desbloquear.
+- ~~Antes de desbloquear el teléfono por primera vez tras reiniciar, Android no
+  entrega `BOOT_COMPLETED`; la alarma se reprograma al desbloquear.~~ Resuelto en D-14.
 - El botón "Probar alarma en 10 segundos" (modo desarrollador) reemplaza la
   alarma que esté programada.
 - ~~Si se abre la app durante la noche, empieza en Inicio y no en el modo noche.~~
@@ -246,6 +247,35 @@ Revisado contra la documentación oficial (cambios de Android 15 y 16,
 
 **Limitación:** en Android 15+ el usuario ve el modo "Do Not Disturb (Descansa)"
 en Ajustes → Modos; el nombre lo pone el sistema.
+
+## D-14 · Integración con la Fase 1 de `develop`: Direct Boot, cambio de hora y respaldos de sonido
+
+La alarma de respaldo se implementó dos veces en paralelo (rama de Uli en
+`develop` y `Rodrigo/desarrollo`). Se conservó la de `Rodrigo/desarrollo`,
+porque las Fases 2 y 3 dependen de ella, y se le portaron las mejoras de la otra:
+
+| Mejora | Cómo |
+|---|---|
+| **Reinicio sin desbloquear** (PIN o huella) | La hora de la alarma vive en el almacenamiento *protegido por dispositivo*, legible antes del desbloqueo. `ArranqueReceiver` escucha `LOCKED_BOOT_COMPLETED`. `AlarmaReceiver`, `ArranqueReceiver`, `TimbreService` y `TimbreActivity` son `directBootAware`. |
+| **Apagar o posponer antes del desbloqueo** | Room, DataStore y las preferencias normales aún no se pueden leer: `TimbreService` recibe sus dependencias como `Lazy` y no las crea. Apagar solo cancela la alarma y anota la hora; al desbloquear (`BOOT_COMPLETED`) se cierra la noche y se restaura el No molestar. Posponer usa 5 minutos (no puede leer Ajustes). |
+| **Cambio de hora o zona** (`TIME_SET`, `TIMEZONE_CHANGED`) | Se guarda también la hora "de reloj" (07:00). Al cambiar, se reprograma a la ocurrencia de esa hora más cercana a la anterior, así no se salta un día (`ocurrenciaMasCercana`, con pruebas). |
+| **Pitido de respaldo** | Si ningún tono se puede abrir (por ejemplo, antes del desbloqueo), `ToneGenerator` pita por el canal de alarma. |
+| **Foco de audio** | La alarma pide el foco: la música o los sonidos de la Fase 5 se pausan mientras suena. |
+
+Se mantienen de la versión de Rodrigo: tolerancia de 1 hora para una alarma
+perdida con el teléfono apagado, silencio a los 10 min, `mediaPlayback` y subir
+el volumen de alarmas si está en 0.
+
+**Probado en el emulador (API 37, 25/11/2026):** con PIN, reinicio sin
+desbloquear: la alarma se reprogramó estando el usuario en `RUNNING_LOCKED`, sonó
+y mostró la pantalla de timbre; "Apagar" la detuvo sin desbloquear, y al
+desbloquear la noche quedó cerrada con la hora en que sonó. Cambio de zona de
+Bogotá a Ciudad de México con alarma a las 23:00: siguió a las 23:00 locales.
+
+**Error encontrado en la prueba y corregido:** si la alarma sonaba con la app
+abierta detrás de la pantalla de bloqueo, `MainActivity` intentaba abrir la
+pantalla de timbre, Android lo bloqueaba y no lo volvía a intentar al desbloquear.
+Ahora se revisa en cada `onResume`.
 
 ---
 

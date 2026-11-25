@@ -1,8 +1,11 @@
 package com.upt.descansa.core.util
 
+import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Locale
+import kotlin.math.abs
 
 /** Minutos que tiene un día. */
 const val MINUTOS_POR_DIA = 24 * 60
@@ -36,3 +39,22 @@ fun proximaOcurrencia(ahora: ZonedDateTime, minutosDelDia: Int): ZonedDateTime {
     val hoy = ahora.toLocalDate().atTime(hora).atZone(ahora.zone)
     return if (hoy.isAfter(ahora)) hoy else ahora.toLocalDate().plusDays(1).atTime(hora).atZone(ahora.zone)
 }
+
+/**
+ * Tras un cambio de hora o de zona horaria: el momento en que el reloj vuelve a
+ * marcar [minutosDelDia] en [zona], eligiendo el más cercano a [anteriorMs]
+ * (la hora a la que iba a sonar). Así una alarma de las 07:00 sigue siendo
+ * "las 07:00 de esta mañana" en la zona nueva, sin saltarse un día.
+ */
+fun ocurrenciaMasCercana(anteriorMs: Long, zona: ZoneId, minutosDelDia: Int): Long {
+    val normalizado = Math.floorMod(minutosDelDia, MINUTOS_POR_DIA)
+    val hora = LocalTime.of(normalizado / 60, normalizado % 60)
+    val dia = Instant.ofEpochMilli(anteriorMs).atZone(zona).toLocalDate()
+    return (-1L..1L)
+        .map { dia.plusDays(it).atTime(hora).atZone(zona).toInstant().toEpochMilli() }
+        .minBy { abs(it - anteriorMs) }
+}
+
+/** "Minutos desde las 00:00" que marca el reloj de [zona] en el instante [epochMs]. */
+fun minutosDelDiaEn(epochMs: Long, zona: ZoneId): Int =
+    Instant.ofEpochMilli(epochMs).atZone(zona).toLocalTime().let { it.hour * 60 + it.minute }

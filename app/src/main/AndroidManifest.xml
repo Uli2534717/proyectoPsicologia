@@ -73,11 +73,17 @@
         </activity>
 
         <!--
+            directBootAware="true" en la pantalla de timbre, su servicio y los dos
+            receptores: funcionan aunque el teléfono se haya reiniciado y nadie lo
+            haya desbloqueado todavía (PIN o huella). Ver docs/DECISIONES.md, D-14.
+        -->
+        <!--
             Pantalla de timbre: tarea propia (taskAffinity vacío) para no mezclarse
             con la app, y fuera de "recientes" porque solo tiene sentido mientras suena.
         -->
         <activity
             android:name=".sistema.alarma.TimbreActivity"
+            android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleInstance"
@@ -93,12 +99,14 @@
 
         <service
             android:name=".sistema.alarma.TimbreService"
+            android:directBootAware="true"
             android:exported="false"
             android:foregroundServiceType="systemExempted|mediaPlayback" />
 
         <!-- Lo llama AlarmManager a la hora de la alarma (no lo pueden llamar otras apps). -->
         <receiver
             android:name=".sistema.alarma.AlarmaReceiver"
+            android:directBootAware="true"
             android:exported="false" />
 
         <!--
@@ -107,11 +115,15 @@
         -->
         <receiver
             android:name=".sistema.alarma.ArranqueReceiver"
+            android:directBootAware="true"
             android:exported="true">
             <intent-filter>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
     </application>

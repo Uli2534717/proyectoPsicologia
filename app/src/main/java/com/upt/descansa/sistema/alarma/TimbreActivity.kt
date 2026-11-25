@@ -3,6 +3,7 @@ package com.upt.descansa.sistema.alarma
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.UserManager
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -50,6 +51,7 @@ import java.time.LocalTime
  * Es una Activity aparte (no una ruta de Navigation) porque necesita
  * `showWhenLocked`/`turnScreenOn` y no debe mezclarse con la pila de la app.
  * No reproduce nada: solo manda "apagar" o "posponer" al [TimbreService].
+ * Es `directBootAware`: funciona aunque el teléfono no se haya desbloqueado tras reiniciar.
  */
 class TimbreActivity : ComponentActivity() {
 
@@ -78,8 +80,9 @@ class TimbreActivity : ComponentActivity() {
                     },
                     onApagar = {
                         TimbreService.enviar(this, TimbreService.ACCION_APAGAR)
-                        // Al apagar se abre el resumen de la mañana.
-                        startActivity(
+                        // Al apagar se abre el resumen de la mañana. Si el teléfono no se ha
+                        // desbloqueado desde que encendió, la app todavía no puede abrirse.
+                        if (getSystemService(UserManager::class.java).isUserUnlocked) startActivity(
                             Intent(this, MainActivity::class.java)
                                 .putExtra(MainActivity.EXTRA_ABRIR_MANANA, true)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),

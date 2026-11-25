@@ -9,13 +9,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
+import android.media.ToneGenerator
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.UserManager
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
@@ -23,9 +26,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.upt.descansa.R
 import com.upt.descansa.core.util.formatearHora
+import com.upt.descansa.domain.model.AjustesUsuario
 import com.upt.descansa.domain.repository.ControlServicioNocturno
 import com.upt.descansa.domain.usecase.noche.ApagarAlarmaUseCase
 import com.upt.descansa.domain.usecase.noche.PosponerAlarmaUseCase
+import dagger.Lazy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,16 +66,22 @@ object EstadoTimbre {
  * - Vibra en paralelo, por si el volumen de alarmas está muy bajo.
  * - Si nadie la apaga en 10 minutos, se calla sola (como el reloj de Android).
  * - Tipos `systemExempted|mediaPlayback` (ver docs/DECISIONES.md, D-11).
+ * - Es `directBootAware`: suena aunque el teléfono se haya reiniciado y nadie lo
+ *   haya desbloqueado. Por eso sus dependencias son `Lazy`: antes del desbloqueo
+ *   no se pueden leer Room, DataStore ni las preferencias normales, y solo se
+ *   crean si el teléfono ya está desbloqueado (D-14).
  */
 @AndroidEntryPoint
 class TimbreService : Service() {
 
-    @Inject lateinit var apagarAlarma: ApagarAlarmaUseCase
-    @Inject lateinit var posponerAlarma: PosponerAlarmaUseCase
-    @Inject lateinit var servicioNocturno: ControlServicioNocturno
+    @Inject lateinit var apagarAlarma: Lazy<ApagarAlarmaUseCase>
+    @Inject lateinit var posponerAlarma: Lazy<PosponerAlarmaUseCase>
+    @Inject lateinit var servicioNocturno: Lazy<ControlServicioNocturno>
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var reproductor: MediaPlayer? = null
+    private var pitido: ToneGenerator? = null
+    private var focoAudio: AudioFocusRequest? = null
     private var vibrador: Vibrator? = null
     private var wakeLock: PowerManager.WakeLock? = null
     private var subidaVolumen: Job? = null
@@ -82,11 +93,8 @@ class TimbreService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            ACCION_APAGAR -> terminar {
-                val ahora = System.currentTimeMillis()
-                apagarAlarma(disparadaEn = sonandoDesde.takeIf { it > 0L } ?: ahora, ahora = ahora)
-            }
-            ACCION_POSPONER -> terminar { posponerAlarma() }
+            ACCION_APAGAR -> terminar { apagar() }
+            ACCION_POSPONER -> terminar { posponer() }
             else -> sonar()
         }
         // NOT_STICKY: si Android matara el servicio, no lo revive sin datos.
@@ -103,14 +111,16 @@ class TimbreService : Service() {
         if (yaSonaba) return
 
         // Ya está sonando (por sueño ligero o por la hora límite): no hace falta seguir midiendo.
-        servicioNocturno.detener()
+        if (desbloqueado()) servicioNocturno.get().detener()
         sonandoDesde = System.currentTimeMillis()
         // Mantiene la CPU despierta mientras suena (se libera sola a los 10 min).
         wakeLock = getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Descansa:timbre")
             .apply { acquire(DURACION_MAXIMA_MS) }
         asegurarVolumenAudible()
+        pedirFocoAudio()
         reproducirSonido()
+        if (reproductor == null) iniciarPitido()
         vibrar()
 
         subidaVolumen = scope.launch {
@@ -122,7 +132,36 @@ class TimbreService : Service() {
             }
             delay(DURACION_MAXIMA_MS - SUBIDA_VOLUMEN_MS)
             // Nadie respondió: se calla y la noche se cierra como si la hubieran apagado.
-            terminar { apagarAlarma(disparadaEn = sonandoDesde) }
+            terminar { apagar() }
+        }
+    }
+
+    private fun desbloqueado(): Boolean = getSystemService(UserManager::class.java).isUserUnlocked
+
+    /**
+     * Cierra la noche. Si el teléfono sigue bloqueado tras un reinicio, solo se
+     * cancela la alarma y se anota: la noche y el No molestar se cierran al desbloquear.
+     */
+    private suspend fun apagar() {
+        val ahora = System.currentTimeMillis()
+        val disparadaEn = sonandoDesde.takeIf { it > 0L } ?: ahora
+        if (desbloqueado()) {
+            apagarAlarma.get()(disparadaEn = disparadaEn, ahora = ahora)
+        } else {
+            AlarmSchedulerImpl(applicationContext).apply {
+                cancelar()
+                cierrePendienteDesde = disparadaEn
+            }
+        }
+    }
+
+    /** Sin desbloquear no se pueden leer los ajustes: se usan los minutos por defecto. */
+    private suspend fun posponer() {
+        if (desbloqueado()) {
+            posponerAlarma.get()()
+        } else {
+            val minutos = AjustesUsuario().posponerMinutos
+            AlarmSchedulerImpl(applicationContext).programar(System.currentTimeMillis() + minutos * 60_000L)
         }
     }
 
@@ -143,7 +182,11 @@ class TimbreService : Service() {
             release()
         }
         reproductor = null
+        pitido?.release()
+        pitido = null
         vibrador?.cancel()
+        focoAudio?.let { getSystemService(AudioManager::class.java).abandonAudioFocusRequest(it) }
+        focoAudio = null
         wakeLock?.let { if (it.isHeld) it.release() }
         EstadoTimbre.sonandoMutable.value = false
     }
@@ -206,6 +249,32 @@ class TimbreService : Service() {
                 player.release()
             }
         }
+    }
+
+    /**
+     * Respaldo si ningún tono se pudo abrir (por ejemplo, tras reiniciar sin
+     * desbloquear, cuando los tonos del usuario aún no se pueden leer): un pitido
+     * por el canal de alarma cada 1.5 s. La alarma nunca queda muda.
+     */
+    private fun iniciarPitido() {
+        val tono = runCatching { ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME) }.getOrNull() ?: return
+        pitido = tono
+        scope.launch {
+            while (pitido != null) {
+                tono.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 800)
+                delay(1_500)
+            }
+        }
+    }
+
+    /** Pide el foco de audio: la música o los sonidos para dormir se pausan mientras suena. */
+    private fun pedirFocoAudio() {
+        val atributos = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()
+        val solicitud = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+            .setAudioAttributes(atributos)
+            .build()
+        getSystemService(AudioManager::class.java).requestAudioFocus(solicitud)
+        focoAudio = solicitud
     }
 
     private fun tonosCandidatos(): List<Uri> = listOfNotNull(
